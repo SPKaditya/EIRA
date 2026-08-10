@@ -171,8 +171,5 @@ hear, and that would then let it go when I told it to. Most of the build time
 went into the persona rather than the plumbing, because getting a voice to sound
 like it means something turned out to be much harder than getting it to speak.
 
-The interface design language began as a [Google Stitch](https://stitch.withgoogle.com)
-concept and was rebuilt by hand as a single self-contained page wired to the
-live backend.
 
 Licensed under the [MIT License](LICENSE).
