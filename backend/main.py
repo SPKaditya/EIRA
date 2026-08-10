@@ -18,6 +18,7 @@ from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
+import clock
 import latency_log
 import llm_client
 import memory
@@ -62,7 +63,8 @@ def _context_block(user_id: str, transcript: str) -> tuple[str, list[dict]]:
     can show which stored memories shaped this specific reply."""
     memories = memory.search(user_id, transcript, limit=4)
     open_tasks = tools.board(user_id)
-    lines = ["RETRIEVED CONTEXT (memories relevant to this turn):"]
+    lines = [clock.current_moment(),
+             "RETRIEVED CONTEXT (memories relevant to this turn):"]
     lines += [f'- [{m["type"]}] {m["text"]}' for m in memories] or ["- (none)"]
     lines.append("OPEN TASKS:")
     lines += [
@@ -99,6 +101,36 @@ def chat(inp: ChatIn):
 
     executed = tools.execute(user_id, result["actions"])
     _apply_memory_writes(user_id, result["memory_writes"])
+
+    # FIX: the original reply was generated BEFORE the plan existed, so on
+    # day_plan turns it comes out vague ("let's tackle the report first...").
+    # One fast follow-up call with the computed slots injected produces the
+    # turn she actually speaks. Replacement happens before TTS -> spoken once.
+    dp = next((x for x in executed if x.get("type") == "day_plan" and x.get("ok")), None)
+    if dp and dp.get("slots"):
+        try:
+            slot_lines = "; ".join(
+                f'{s["title"]} at {s["start_spoken"]}, {s["minutes_spoken"]} minutes ({s["why"]})'
+                for s in dp["slots"]
+            )
+            note = (
+                f"{clock.current_moment()}\n"
+                f"You just built his plan for {dp['plan_for']}. The slots, in order: "
+                f"{slot_lines}."
+                + (" He is short on sleep, so the plan was trimmed." if dp.get("low_energy") else "")
+                + " Now say it to him: ONE spoken turn, maximum three sentences, every "
+                "number as spoken words, walking the plan naturally rather than reciting "
+                "a list, ending with exactly one short confirmation question. If the plan "
+                "is for tomorrow because it is late now, say that plainly."
+            )
+            plan_result, plan_brain, plan_ms = llm_client.chat(
+                SYSTEM_PROMPT, [{"role": "user", "content": note}]
+            )
+            if plan_result.get("reply"):
+                reply = plan_result["reply"]
+                brain, llm_ms = plan_brain, llm_ms + plan_ms
+        except Exception:
+            logger.exception("day_plan follow-up failed; keeping original reply")
 
     audio_b64, tts_ms = "", 0.0
     if reply:
@@ -137,13 +169,16 @@ def session_start(user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
         # un-human and slow to speak.
         headline = flag["evidence"][-1]
         note = (
+            f"{clock.current_moment()}\n"
             "SESSION START. Your pattern scan flagged something. Open proactively at "
             "the MENTION/SUGGEST level: state this one fact in spoken words, then one "
             "short suggestion as a question. Do NOT list other numbers. "
             f"The fact: {headline}. Topic: {flag['topic']}."
         )
     else:
-        note = "SESSION START. Nothing flagged. Open with a warm, short greeting."
+        note = (f"{clock.current_moment()}\n"
+                "SESSION START. Nothing flagged. Open with a warm, short greeting "
+                "that fits the time of day.")
 
     # The opener is the emotional peak and fires once during page load, so it
     # buys warmth with latency nobody is sitting through.

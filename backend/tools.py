@@ -60,8 +60,18 @@ def memory_delete(user_id: str, a: dict) -> dict:
 def day_plan(user_id: str, a: dict) -> dict:
     """Adaptive day plan: order open tasks by what the week actually shows.
     Postponed-and-high-priority first (avoidance costs the most), low-energy
-    slots when sleep is short. Returns structured slots for the UI; EIRA speaks
-    only the headline."""
+    slots when sleep is short. Clock-aware: never schedules a slot in the past;
+    late at night the whole plan rolls to tomorrow and says so."""
+    from datetime import datetime
+
+    import clock
+
+    now = datetime.now()
+    if clock.is_late(now):
+        plan_for, start_clock = "tomorrow", 9
+    else:
+        plan_for, start_clock = "today", max(9, now.hour + 1)
+
     tasks = board(user_id)
     logs = memory.list_all(user_id, kind="pattern_log")
     sleeps = sorted(
@@ -76,23 +86,26 @@ def day_plan(user_id: str, a: dict) -> dict:
         return (-int(t.get("postpone_count") or 0), pri)
 
     ordered = sorted(tasks, key=weight)
-    slots, clock = [], 9
+    slots, hour = [], start_clock
     for t in ordered:
         heavy = int(t.get("postpone_count") or 0) >= 2 or t.get("priority") == "high"
         mins = 90 if heavy else 45
         slots.append({
             "title": t["text"],
-            "start": f"{clock:02d}:00",
+            "start": f"{hour:02d}:00",
+            "start_spoken": clock.spoken_clock(hour),
             "minutes": mins,
+            "minutes_spoken": clock.num_words(mins),
             "why": "postponed twice, front-loaded" if int(t.get("postpone_count") or 0) >= 2
                    else ("high priority" if t.get("priority") == "high" else "fits the gap"),
         })
-        clock += 2 if heavy else 1
+        hour += 2 if heavy else 1
         if low_energy and len(slots) >= 3:
             break
 
     return {
         "type": "day_plan", "ok": True, "slots": slots,
+        "plan_for": plan_for,
         "low_energy": low_energy,
         "avg_sleep": round(avg_sleep, 1) if avg_sleep is not None else None,
     }

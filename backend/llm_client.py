@@ -86,16 +86,34 @@ def _gemini_call(genai, types, api_key: str, system: str, messages: list[dict]) 
     return resp.text
 
 
+# Groq's free tier caps tokens PER MODEL per day (100k TPD each). Heavy testing
+# exhausted llama's budget mid-build, so the chain walks sibling models — each
+# with its own budget — before giving up and letting Gemini catch it.
+# gpt-oss-120b was the measured warmth runner-up; 8b-instant is the last resort.
+GROQ_CHAIN = list(dict.fromkeys([GROQ_MODEL, "openai/gpt-oss-120b", "llama-3.1-8b-instant"]))
+_groq_idx = 0  # sticky: remember which model is currently accepting
+
+
 def _groq(system: str, messages: list[dict]) -> str:
+    global _groq_idx
     from groq import Groq
 
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
-    resp = client.chat.completions.create(
-        model=GROQ_MODEL,
-        messages=[{"role": "system", "content": system}, *messages],
-        response_format={"type": "json_object"},
-    )
-    return resp.choices[0].message.content
+    last_exc: Exception | None = None
+    for offset in range(len(GROQ_CHAIN)):
+        idx = (_groq_idx + offset) % len(GROQ_CHAIN)
+        try:
+            resp = client.chat.completions.create(
+                model=GROQ_CHAIN[idx],
+                messages=[{"role": "system", "content": system}, *messages],
+                response_format={"type": "json_object"},
+            )
+            _groq_idx = idx
+            return resp.choices[0].message.content
+        except Exception as exc:
+            logger.warning("groq model %s failed: %s", GROQ_CHAIN[idx], str(exc)[:110])
+            last_exc = exc
+    raise last_exc if last_exc is not None else RuntimeError("groq: no model attempted")
 
 
 def _try_brain(fn, name: str, system: str, messages: list[dict]) -> dict | None:

@@ -1,7 +1,12 @@
 """Seed the synthetic demo week into Qdrant (idempotent: wipes the user first).
-Numbers mirror data/wearable_sim.json — keep them in sync. RUN BEFORE DEMO."""
+
+Dates are ROLLED to end at today on every run — the hour values in
+data/wearable_sim.json are the fixture, the dates are relative — and the json
+is rewritten with the rolled dates so the UI's sleep chart, the receipts, and
+the pattern engine all agree on when "last night" was. RUN BEFORE DEMO."""
 import json
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -19,7 +24,21 @@ def main() -> None:
     memory.wipe_user(USER)
     print(f"wiped user '{USER}'")
 
-    wearable = json.loads((ROOT / "data" / "wearable_sim.json").read_text())
+    wpath = ROOT / "data" / "wearable_sim.json"
+    wearable = json.loads(wpath.read_text())
+
+    # roll all dates so the series ends today
+    hours = [e["hours"] for e in wearable["sleep_hours"]]
+    days = [date.today() - timedelta(days=len(hours) - 1 - i) for i in range(len(hours))]
+    wearable["sleep_hours"] = [
+        {"date": d.isoformat(), "hours": h} for d, h in zip(days, hours, strict=True)
+    ]
+    wearable["late_sessions"] = [
+        f"{(date.today() - timedelta(days=k)).isoformat()}T01:3{i}"
+        for i, k in enumerate((4, 2, 0))
+    ]
+    wpath.write_text(json.dumps(wearable, indent=2) + "\n")
+    print("rolled wearable dates ->", days[0], "..", days[-1])
 
     for entry in wearable["sleep_hours"]:
         memory.upsert(
@@ -35,10 +54,11 @@ def main() -> None:
         )
     print(f"seeded {len(wearable['late_sessions'])} late sessions")
 
-    for i, date in enumerate(["2026-08-05", "2026-08-07", "2026-08-09"]):
+    for k in (5, 3, 1):
+        d = (date.today() - timedelta(days=k)).isoformat()
         memory.upsert(
-            USER, "pattern_log", f"said 'I'll handle it' ({date})",
-            {"metric": "ill_handle_it", "date": date},
+            USER, "pattern_log", f"said 'I'll handle it' ({d})",
+            {"metric": "ill_handle_it", "date": d},
         )
     print("seeded 3 deflection logs")
 
