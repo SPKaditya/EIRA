@@ -1,4 +1,4 @@
-# secrets, never commit
+﻿# secrets, never commit
 .env
 
 # python
@@ -15,3 +15,6 @@ stitch_eira_voice_companion_interface.zip
 # vendor documentation condensed for local reference only, not ours to redistribute
 rime-docs.md
 qdrant-docs.md
+
+# internal build notes, kept locally
+claude_code_build_brief_EIRA.md

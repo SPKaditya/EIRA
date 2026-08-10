@@ -160,15 +160,19 @@ only to this backend. `.env` is gitignored and `.env.example` ships with empty
 placeholders. All demo content is synthetic: no real personal data appears in
 prompts, logs, screenshots, or this repository.
 
-## Credits
+## About
 
-Built by [Aditya Sharma](https://github.com/SPKaditya).
+Built by [Aditya Sharma](https://github.com/SPKaditya) for StarForge 2026.
 
-Developed with **Claude Code** (Anthropic) as a pair-programming assistant, used
-for implementation, debugging, and prompt iteration; all architecture and design
-decisions, the persona calibration, and every delivery judgement were made and
-verified by the author. The interface design system originated in a
-[Google Stitch](https://stitch.withgoogle.com) concept and was rebuilt by hand as
-a single self-contained page wired to the live backend.
+EIRA started from a simple frustration: every assistant I had used waited to be
+told what to do, and none of them noticed anything. I wanted one that had read
+the week before I opened my mouth, that could say something I did not ask to
+hear, and that would then let it go when I told it to. Most of the build time
+went into the persona rather than the plumbing, because getting a voice to sound
+like it means something turned out to be much harder than getting it to speak.
+
+The interface design language began as a [Google Stitch](https://stitch.withgoogle.com)
+concept and was rebuilt by hand as a single self-contained page wired to the
+live backend.
 
 Licensed under the [MIT License](LICENSE).
