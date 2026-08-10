@@ -1,4 +1,4 @@
-﻿# secrets, never commit
+# secrets, never commit
 .env
 
 # python
@@ -9,12 +9,9 @@ __pycache__/
 data/latency.jsonl
 scripts/*.mp3
 
-# bulky design export (kept locally, not in the repo)
-stitch_eira_voice_companion_interface.zip
-
-# vendor documentation condensed for local reference only, not ours to redistribute
+# local-only working files: design exports, build notes, vendor docs
+# condensed for reference and not ours to redistribute
+*.zip
+build_notes_local.md
 rime-docs.md
 qdrant-docs.md
-
-# internal build notes, kept locally
-claude_code_build_brief_EIRA.md
