@@ -12,7 +12,11 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(ROOT / ".env")
+sys.path.insert(0, str(ROOT / "backend"))
+
+import rime_client  # noqa: E402
 
 API_KEY = os.getenv("RIME_API_KEY")
 
@@ -26,7 +30,8 @@ CANDIDATES = ["hawa", "nadi"]
 
 
 def sanitize(text: str) -> str:
-    return text.replace(", ", ", ").replace("-", ", ")
+    """Same normalisation production applies, so what you hear is what ships."""
+    return rime_client.sanitize_for_speech(text)
 
 
 def main() -> None:
