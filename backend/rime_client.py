@@ -51,6 +51,10 @@ def speak(text: str) -> tuple[bytes, float]:
             "text": text,
             "speaker": os.environ["RIME_SPEAKER"],
             "modelId": os.getenv("RIME_MODEL", "coda"),
+            # Coda: >1.0 = faster (per the Arcana->Coda migration notes; NOT the
+            # inverted Mist v2 semantics). RIME_SPEED slightly under 1.0 gives
+            # nadi a more unhurried, considered delivery.
+            **({"speedAlpha": float(os.getenv("RIME_SPEED"))} if os.getenv("RIME_SPEED") else {}),
         },
         timeout=60,
     )
