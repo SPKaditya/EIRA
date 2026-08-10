@@ -1,19 +1,44 @@
-"""Action execution. Phase 1 ships board ops as thin wrappers over memory.py;
-ics/web_lookup/handoff arrive in Phase 3 and slot into EXECUTORS."""
+"""Action execution: board operations, the adaptive day plan, and memory
+audit/delete. Every action EIRA can take is registered in EXECUTORS; anything
+not in that table is refused, so the model cannot invent capabilities."""
 import logging
+import re
 
 import memory
 
 logger = logging.getLogger("eira.tools")
 
 
+def _norm(s: str) -> str:
+    """Loose title key for dedupe: case/punctuation/whitespace insensitive."""
+    return re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).strip()
+
+
 def create_task(user_id: str, a: dict) -> dict:
+    """Create a task, or quietly reschedule the existing one if it is already on
+    the board. Without this the model re-creating a task it already knows about
+    (common when he mentions it again) produced duplicate rows in the UI."""
+    title = a.get("title", a.get("text", "untitled"))
+    key = _norm(title)
+
+    for t in memory.list_all(user_id, kind="task"):
+        if _norm(t.get("text", "")) != key:
+            continue
+        patch = {"status": "todo"}
+        if a.get("when"):
+            patch["scheduled_for"] = a["when"]
+        if a.get("priority"):
+            patch["priority"] = a["priority"]
+        memory.update_payload(user_id, t["id"], patch)
+        return {"type": "create_task", "ok": True, "id": t["id"],
+                "title": t["text"], "deduped": True}
+
     pid = memory.upsert(
-        user_id, "task", a.get("title", a.get("text", "untitled")),
+        user_id, "task", title,
         {"status": "todo", "priority": a.get("priority", "normal"),
          "scheduled_for": a.get("when"), "postpone_count": 0},
     )
-    return {"type": "create_task", "ok": True, "id": pid}
+    return {"type": "create_task", "ok": True, "id": pid, "title": title}
 
 
 def _find_task(user_id: str, title: str) -> dict | None:

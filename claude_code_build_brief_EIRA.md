@@ -13,10 +13,9 @@ HTTP synthesis. Do NOT use LiveKit, Pipecat, WebSockets, or any agent framework.
 **Build philosophy: working > pretty. Follow BUILD ORDER exactly. Stop at each
 CHECKPOINT and show the result before continuing. Never block a phase on a nice-to-have.**
 
-**Reference material in this folder: `rime-docs.md` (condensed full Rime docs).
-Live in: Part 1 request-parameter table, Part 2 Coda endpoints, Part 3 text rules,
-Part 4 agent-loop pattern. If code disagrees with the file, live docs win
-(append `.md` to any docs.rime.ai URL for clean markdown).**
+**Reference material (local only, not committed — vendor docs are not ours to
+redistribute): condensed Rime and Qdrant documentation. Authoritative source is
+always the live docs — append `.md` to any docs.rime.ai URL for clean markdown.**
 
 ---
 

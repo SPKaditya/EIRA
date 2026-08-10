@@ -11,3 +11,7 @@ scripts/*.mp3
 
 # bulky design export (kept locally, not in the repo)
 stitch_eira_voice_companion_interface.zip
+
+# vendor documentation condensed for local reference only — not ours to redistribute
+rime-docs.md
+qdrant-docs.md

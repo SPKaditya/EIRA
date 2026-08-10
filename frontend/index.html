@@ -26,7 +26,9 @@ body{
     radial-gradient(800px 600px at 108% 88%, rgba(243,174,255,.07), transparent 55%),
     linear-gradient(168deg,var(--bg2) 0%,var(--bg) 46%,var(--lowest) 100%);
   color:var(--tx); font:15px/1.65 "Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
-  min-height:100vh; padding:26px 22px 64px; display:flex; flex-direction:column; align-items:center;
+  /* bottom padding clears the fixed status bar so the conversation card is
+     never hidden underneath it */
+  min-height:100vh; padding:26px 22px 104px; display:flex; flex-direction:column; align-items:center;
 }
 
 /* ---------- header ---------- */
@@ -93,6 +95,15 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 #heard{font-size:11.5px;color:var(--dim);min-height:17px;font-style:italic}
 #st{font-size:12.5px;color:var(--dim);min-height:19px;text-align:center}
 
+/* laptop-height screens: shrink the orb so the conversation stays on-screen
+   instead of hiding below the fold */
+@media (max-height: 900px){
+  #aura{width:min(250px,58vw)}
+  #orbText{font-size:13.5px;-webkit-line-clamp:5}
+  header{margin-bottom:14px}
+  #feed{max-height:24vh}
+}
+
 /* ---------- conversation ---------- */
 #convo{width:100%;max-width:600px}
 #feed{max-height:30vh;overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:13px;scrollbar-width:thin}
@@ -122,12 +133,15 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 
 /* ---------- lists ---------- */
 ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-li.row{background:rgba(255,255,255,.035);border:1px solid var(--edge-soft);border-radius:var(--r);
+li.row{flex-wrap:wrap;row-gap:6px;
+  background:rgba(255,255,255,.035);border:1px solid var(--edge-soft);border-radius:var(--r);
   padding:10px 12px;display:flex;gap:9px;align-items:center;font-size:13px;transition:.15s}
 li.row:hover{background:rgba(255,255,255,.06)}
-li.row .m{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* title takes its own full line so it never truncates; pills wrap beneath */
+li.row .m{flex:1 1 100%;min-width:0;overflow-wrap:anywhere}
 .pill{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
-  padding:3px 9px;border-radius:9999px;background:rgba(255,255,255,.07);color:var(--tx2);white-space:nowrap}
+  padding:3px 9px;border-radius:9999px;background:rgba(255,255,255,.07);color:var(--tx2);
+  white-space:nowrap;flex:0 0 auto}
 .pill.pref{background:rgba(160,120,255,.16);color:var(--primary)}
 .pill.corr{background:rgba(255,178,185,.14);color:var(--coral)}
 .pill.hi{background:rgba(234,100,121,.16);color:var(--coral)}
