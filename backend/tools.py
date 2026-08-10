@@ -1,0 +1,137 @@
+"""Action execution. Phase 1 ships board ops as thin wrappers over memory.py;
+ics/web_lookup/handoff arrive in Phase 3 and slot into EXECUTORS."""
+import logging
+
+import memory
+
+logger = logging.getLogger("eira.tools")
+
+
+def create_task(user_id: str, a: dict) -> dict:
+    pid = memory.upsert(
+        user_id, "task", a.get("title", a.get("text", "untitled")),
+        {"status": "todo", "priority": a.get("priority", "normal"),
+         "scheduled_for": a.get("when"), "postpone_count": 0},
+    )
+    return {"type": "create_task", "ok": True, "id": pid}
+
+
+def _find_task(user_id: str, title: str) -> dict | None:
+    hits = memory.search(user_id, title, limit=1, kind="task")
+    return hits[0] if hits else None
+
+
+def complete_task(user_id: str, a: dict) -> dict:
+    t = _find_task(user_id, a.get("title", ""))
+    if not t:
+        return {"type": "complete_task", "ok": False, "why": "not found"}
+    memory.update_payload(user_id, t["id"], {"status": "done"})
+    return {"type": "complete_task", "ok": True, "title": t["text"]}
+
+
+def reschedule_task(user_id: str, a: dict) -> dict:
+    t = _find_task(user_id, a.get("title", ""))
+    if not t:
+        return {"type": "reschedule_task", "ok": False, "why": "not found"}
+    memory.update_payload(user_id, t["id"], {"scheduled_for": a.get("when")})
+    return {"type": "reschedule_task", "ok": True, "title": t["text"], "when": a.get("when")}
+
+
+def postpone_task(user_id: str, a: dict) -> dict:
+    t = _find_task(user_id, a.get("title", ""))
+    if not t:
+        return {"type": "postpone_task", "ok": False, "why": "not found"}
+    memory.update_payload(user_id, t["id"], {"postpone_count": int(t.get("postpone_count") or 0) + 1})
+    return {"type": "postpone_task", "ok": True, "title": t["text"]}
+
+
+def memory_audit(user_id: str, a: dict) -> dict:
+    items = memory.list_all(user_id)
+    return {"type": "memory_audit", "ok": True, "count": len(items),
+            "items": [{"type": i["type"], "text": i["text"]} for i in items]}
+
+
+def memory_delete(user_id: str, a: dict) -> dict:
+    gone = memory.delete_matching(user_id, a.get("query", ""), limit=1)
+    return {"type": "memory_delete", "ok": bool(gone),
+            "deleted": [g["text"] for g in gone]}
+
+
+def day_plan(user_id: str, a: dict) -> dict:
+    """Adaptive day plan: order open tasks by what the week actually shows.
+    Postponed-and-high-priority first (avoidance costs the most), low-energy
+    slots when sleep is short. Returns structured slots for the UI; EIRA speaks
+    only the headline."""
+    tasks = board(user_id)
+    logs = memory.list_all(user_id, kind="pattern_log")
+    sleeps = sorted(
+        [p for p in logs if p.get("metric") == "sleep_hours"],
+        key=lambda p: p.get("date", ""),
+    )[-3:]
+    avg_sleep = sum(float(p["value"]) for p in sleeps) / len(sleeps) if sleeps else None
+    low_energy = avg_sleep is not None and avg_sleep < 6.0
+
+    def weight(t: dict) -> tuple:
+        pri = {"high": 0, "normal": 1, "low": 2}.get(t.get("priority", "normal"), 1)
+        return (-int(t.get("postpone_count") or 0), pri)
+
+    ordered = sorted(tasks, key=weight)
+    slots, clock = [], 9
+    for t in ordered:
+        heavy = int(t.get("postpone_count") or 0) >= 2 or t.get("priority") == "high"
+        mins = 90 if heavy else 45
+        slots.append({
+            "title": t["text"],
+            "start": f"{clock:02d}:00",
+            "minutes": mins,
+            "why": "postponed twice, front-loaded" if int(t.get("postpone_count") or 0) >= 2
+                   else ("high priority" if t.get("priority") == "high" else "fits the gap"),
+        })
+        clock += 2 if heavy else 1
+        if low_energy and len(slots) >= 3:
+            break
+
+    return {
+        "type": "day_plan", "ok": True, "slots": slots,
+        "low_energy": low_energy,
+        "avg_sleep": round(avg_sleep, 1) if avg_sleep is not None else None,
+    }
+
+
+EXECUTORS = {
+    "day_plan": day_plan,
+    "create_task": create_task,
+    "complete_task": complete_task,
+    "reschedule_task": reschedule_task,
+    "postpone_task": postpone_task,
+    "memory_audit": memory_audit,
+    "memory_delete": memory_delete,
+}
+
+
+def execute(user_id: str, actions: list[dict]) -> list[dict]:
+    """Run each action; a failing action never crashes the turn."""
+    results = []
+    for a in actions or []:
+        if not isinstance(a, dict) or not a.get("type"):
+            # models occasionally emit {"type": null} or a bare string; refusing
+            # it silently is right — a malformed action must not surface as a
+            # scary FAIL row in the UI, and must never crash the turn
+            logger.warning("dropped malformed action: %r", a)
+            continue
+        fn = EXECUTORS.get(a["type"])
+        if fn is None:
+            results.append({"type": a["type"], "ok": False, "why": "unknown action"})
+            continue
+        try:
+            results.append(fn(user_id, a))
+        except Exception as exc:
+            logger.exception("action failed: %s", a)
+            results.append({"type": a.get("type"), "ok": False, "why": str(exc)})
+    return results
+
+
+def board(user_id: str) -> list[dict]:
+    """Open tasks for the UI panel and the LLM context."""
+    tasks = memory.list_all(user_id, kind="task")
+    return [t for t in tasks if t.get("status") != "done"]

@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+requests
+qdrant-client[fastembed]
+google-genai
+groq
+ddgs

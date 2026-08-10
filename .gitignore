@@ -1,0 +1,13 @@
+# secrets — never commit
+.env
+
+# python
+__pycache__/
+*.pyc
+
+# runtime artifacts
+data/latency.jsonl
+scripts/*.mp3
+
+# bulky design export (kept locally, not in the repo)
+stitch_eira_voice_companion_interface.zip
