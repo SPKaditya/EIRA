@@ -180,10 +180,11 @@ def session_start(user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
                 "SESSION START. Nothing flagged. Open with a warm, short greeting "
                 "that fits the time of day.")
 
-    # The opener is the emotional peak and fires once during page load, so it
-    # buys warmth with latency nobody is sitting through.
+    # Demo-night reversal: Gemini degraded to 46s openers (slow + bad-JSON
+    # retries), and "she's waking up" cannot take a minute. The fast chain with
+    # few-shot is warm enough; Gemini stays as the automatic fallback only.
     result, brain, llm_ms = llm_client.chat(
-        SYSTEM_PROMPT, [*FEWSHOT, {"role": "user", "content": note}], warm=True
+        SYSTEM_PROMPT, [*FEWSHOT, {"role": "user", "content": note}]
     )
     reply = result["reply"]
     HISTORY[user_id].clear()

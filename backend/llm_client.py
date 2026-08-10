@@ -67,7 +67,12 @@ def _gemini(system: str, messages: list[dict]) -> str:
 
 
 def _gemini_call(genai, types, api_key: str, system: str, messages: list[dict]) -> str:
-    client = genai.Client(api_key=api_key)
+    # hard per-call timeout: a degraded Gemini must fail fast and yield to the
+    # next key/brain, never hang the voice loop (observed 46s openers without it)
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(timeout=12_000),
+    )
     contents = [
         types.Content(
             role="model" if m["role"] == "assistant" else "user",
