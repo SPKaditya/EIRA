@@ -162,7 +162,7 @@ prompts, logs, screenshots, or this repository.
 
 ## About
 
-Built by [Aditya Sharma](https://github.com/SPKaditya) for StarForge 2026.
+Built by [Team Spark](https://github.com/SPKaditya) for StarForge 2026.
 
 EIRA started from a simple frustration: every assistant I had used waited to be
 told what to do, and none of them noticed anything. I wanted one that had read
