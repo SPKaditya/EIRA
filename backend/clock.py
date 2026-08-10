@@ -1,4 +1,4 @@
-"""Time-and-place awareness. EIRA gets told what moment it is — in spoken words,
+"""Time-and-place awareness. EIRA gets told what moment it is, in spoken words,
 because anything that might be echoed into a reply must already be TTS-safe."""
 import os
 from datetime import datetime

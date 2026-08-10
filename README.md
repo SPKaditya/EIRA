@@ -1,8 +1,8 @@
-# EIRA — Emotionally Intelligent Real-time Agent
+# EIRA: Emotionally Intelligent Real-time Agent
 
 **A voice companion that notices the person behind the tasks.**
 She remembers across sessions, spots burnout patterns *with evidence*, and
-renegotiates your day out loud — then drops a subject for good when you ask her to.
+renegotiates your day out loud. Ask her to drop a subject and she drops it for good.
 
 Built for **StarForge 2026 · VoxForge track**.
 Voice by **Rime Coda** · memory by **Qdrant** · reasoning by **Groq + Gemini**.
@@ -21,7 +21,7 @@ looked at your week:
 
 Nobody prompted that. A pattern engine scanned her stored memory at session start,
 found three consecutive nights under six hours, and handed her one piece of
-evidence to raise — gently, once.
+evidence to raise gently, once.
 
 Every claim she makes is backed by a **receipt** shown in the interface. She never
 says "you seem tired"; she says "three nights under six hours" and shows you the
@@ -32,8 +32,8 @@ row it came from.
 ### 1. Memory that visibly changes the answer
 
 The left rail shows **exactly which stored memories were retrieved for the reply
-you just heard**, with their similarity scores. Not a claim that memory matters —
-the actual vectors that shaped the sentence.
+you just heard**, with their similarity scores. This is not a claim that memory
+matters. These are the actual vectors that shaped the sentence.
 
 ![Recalled memories with similarity scores shape EIRA's answer](docs/02-memory-recall.png)
 
@@ -49,12 +49,12 @@ response, never a one-beat brush-off:
 
 The receipt comes first, the warm yield only after you push back a second time.
 Say **"stop asking about the gym"** and a suppression is written to the vector
-store — she will not raise it again in this session or any future one, because the
+store. She will not raise it again in this session or any future one, because the
 refusal is *data*, not a flag in memory.
 
 ### 3. A plan that respects the clock
 
-Ask her to plan your day and she orders tasks by what your week actually shows —
+Ask her to plan your day and she orders tasks by what your week actually shows:
 avoided work front-loaded, the schedule trimmed when you are short on sleep. Ask
 after midnight and the plan rolls to tomorrow, and she says so.
 
@@ -77,8 +77,8 @@ mp3 + receipts + recalled memories + board + day plan
 ```
 
 Deliberately no LiveKit, no WebSockets, no agent framework. Request/response and
-half-duplex, with barge-in handled client-side — the whole system is ~1,100 lines
-you can read in one sitting.
+half-duplex, with barge-in handled client-side. The whole system is about 1,100
+lines you can read in one sitting.
 
 **Barge-in:** press the orb while she's talking and she stops, works out how much
 of the sentence you actually heard, and continues from there instead of repeating
@@ -112,7 +112,7 @@ Keys needed: [Rime](https://app.rime.ai/tokens) ·
 **Memory is multi-tenant by construction.** One Qdrant collection with payload
 partitioning, `user_id` indexed as a tenant keyword (`is_tenant=True`) per
 Qdrant's own multitenancy guidance. Every search, scroll, payload update and
-delete carries the user filter — there is no code path that queries without it.
+delete carries the user filter. There is no code path that queries without it.
 `test_qdrant.py` asserts a different `user_id` retrieves nothing. Embeddings use
 the `models.Document` FastEmbed pattern at both write and query, so there is no
 hand-rolled encoding step to drift out of sync.
@@ -121,14 +121,14 @@ hand-rolled encoding step to drift out of sync.
 sibling models (each has its own daily token budget) before falling through to a
 rotating pool of Gemini keys; either provider failing is invisible to the user.
 During the build Gemini retired a model mid-session, then hit quota, then went
-into a high-demand degradation — and no turn was ever dropped. Every reply reports
+into a high-demand degradation. No turn was ever dropped. Every reply reports
 which brain answered, in the status bar.
 
 **Warmth is prompt engineering, not an API feature.** Rime Coda exposes no emotion
 tags: delivery comes only from wording and punctuation. So the persona rations
 address terms (constant use reads as a verbal tic), names the reactive sounds the
 engine renders correctly (`hmm`, `mmhm`, `haha`, `nah`, `alright`), and places the
-beat precisely — `Haha, okay... I believe you` lands as affection where
+beat precisely. `Haha, okay... I believe you` lands as affection, where
 `Haha, alright. I believe you.` lands as mockery. That distinction was found by
 ear and encoded as a rule.
 
@@ -155,7 +155,7 @@ call degrades to a normal turn instead of an error.
 
 ## Security and data handling
 
-API keys are server-side only and never reach the browser — the frontend talks
+API keys are server-side only and never reach the browser. The frontend talks
 only to this backend. `.env` is gitignored and `.env.example` ships with empty
 placeholders. All demo content is synthetic: no real personal data appears in
 prompts, logs, screenshots, or this repository.

@@ -20,7 +20,7 @@ def main() -> None:
     if not API_KEY:
         sys.exit("RIME_API_KEY missing in .env")
     if not SPEAKER:
-        sys.exit("RIME_SPEAKER missing in .env — run pick_voice.py first")
+        sys.exit("RIME_SPEAKER missing in .env, run pick_voice.py first")
 
     t0 = time.perf_counter()
     resp = requests.post(

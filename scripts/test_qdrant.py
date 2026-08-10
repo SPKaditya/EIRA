@@ -1,5 +1,4 @@
-"""Phase 0: prove Qdrant Cloud round-trips through the REAL memory module —
-collection + tenant indexes created, Document-pattern upsert, filtered search."""
+"""Phase 0: prove Qdrant Cloud round-trips through the REAL memory module, collection + tenant indexes created, Document-pattern upsert, filtered search."""
 import sys
 from pathlib import Path
 
@@ -30,7 +29,7 @@ def main() -> None:
 
     stranger = memory.search("someone_else", "how should I address the user?", limit=1)
     if stranger:
-        sys.exit("FAIL: tenant isolation broken — another user_id saw the memory")
+        sys.exit("FAIL: tenant isolation broken, another user_id saw the memory")
     print("OK  tenant isolation: other user_id sees nothing")
 
 

@@ -44,7 +44,7 @@ def main() -> None:
         out.write_bytes(r.content)
         print(f"{name:16s} ({speed or 'default'}): {out.name}  {ms:.0f} ms")
     print("\nListen in order. If a slowed one wins, set RIME_SPEED in .env "
-          "(e.g. RIME_SPEED=0.92) and restart. Beat phrasing needs no setting — "
+          "(e.g. RIME_SPEED=0.92) and restart. Beat phrasing needs no setting, "
           "the persona now writes it automatically.")
 
 

@@ -29,9 +29,9 @@ def main() -> None:
     ]
 
     for title, tier in [
-        ("TIER 1 — female, Indian (use one of these)", tier1),
-        ("TIER 2 — Indian, other gender", tier2),
-        ("TIER 3 — fallback: female English flagship voices", tier3[:8]),
+        ("TIER 1, female, Indian (use one of these)", tier1),
+        ("TIER 2, Indian, other gender", tier2),
+        ("TIER 3, fallback: female English flagship voices", tier3[:8]),
     ]:
         print(f"== {title} ==")
         if not tier:

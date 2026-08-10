@@ -153,7 +153,7 @@ def execute(user_id: str, actions: list[dict]) -> list[dict]:
     for a in actions or []:
         if not isinstance(a, dict) or not a.get("type"):
             # models occasionally emit {"type": null} or a bare string; refusing
-            # it silently is right — a malformed action must not surface as a
+            # it silently is right, a malformed action must not surface as a
             # scary FAIL row in the UI, and must never crash the turn
             logger.warning("dropped malformed action: %r", a)
             continue

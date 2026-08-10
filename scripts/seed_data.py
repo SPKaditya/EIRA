@@ -1,7 +1,7 @@
 """Seed the synthetic demo week into Qdrant (idempotent: wipes the user first).
 
-Dates are ROLLED to end at today on every run — the hour values in
-data/wearable_sim.json are the fixture, the dates are relative — and the json
+Dates are ROLLED to end at today on every run, the hour values in
+data/wearable_sim.json are the fixture, the dates are relative, and the json
 is rewritten with the rolled dates so the UI's sleep chart, the receipts, and
 the pattern engine all agree on when "last night" was. RUN BEFORE DEMO."""
 import json
@@ -63,7 +63,7 @@ def main() -> None:
     print("seeded 3 deflection logs")
 
     tasks = [
-        ("Project report – final draft", {"status": "todo", "priority": "high", "postpone_count": 2}),
+        ("Project report, final draft", {"status": "todo", "priority": "high", "postpone_count": 2}),
         ("DBMS assignment", {"status": "todo", "priority": "normal", "postpone_count": 0}),
         ("Call home", {"status": "todo", "priority": "low", "postpone_count": 0}),
         ("Gym", {"status": "todo", "priority": "normal", "postpone_count": 2, "recurring": True}),

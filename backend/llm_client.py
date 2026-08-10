@@ -15,7 +15,7 @@ logger = logging.getLogger("eira.llm")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 # Measured against gpt-oss-120b on the FINAL persona + few-shot: llama is warmer
 # AND ~4x faster (median 681 ms vs 2965 ms, equal reactive-sound count). The
-# earlier terseness was the prompt, not the model — once the persona named the
+# earlier terseness was the prompt, not the model, once the persona named the
 # sounds and forbade bare acknowledgements, llama carried the register fine.
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
@@ -30,7 +30,7 @@ def _parse(text: str) -> dict:
 
 def _gemini_keys() -> list[str]:
     """GEMINI_API_KEY plus any GEMINI_API_KEY_<n>. Scans until a gap so adding a
-    key is purely a .env edit — no code change."""
+    key is purely a .env edit, no code change."""
     keys = [os.getenv("GEMINI_API_KEY")]
     n = 2
     while (k := os.getenv(f"GEMINI_API_KEY_{n}")):
@@ -59,8 +59,7 @@ def _gemini(system: str, messages: list[dict]) -> str:
             _gemini_key_idx = idx
             return text
         except Exception as exc:
-            # quota/auth failures rotate to the next key; other errors too —
-            # a dead retry path costs the same either way
+            # quota/auth failures rotate to the next key; other errors too,             # a dead retry path costs the same either way
             logger.warning("gemini key #%d failed: %s", idx + 1, str(exc)[:120])
             last_exc = exc
     raise last_exc if last_exc is not None else RuntimeError("gemini: no key attempted")
@@ -92,8 +91,8 @@ def _gemini_call(genai, types, api_key: str, system: str, messages: list[dict]) 
 
 
 # Groq's free tier caps tokens PER MODEL per day (100k TPD each). Heavy testing
-# exhausted llama's budget mid-build, so the chain walks sibling models — each
-# with its own budget — before giving up and letting Gemini catch it.
+# exhausted llama's budget mid-build, so the chain walks sibling models, each
+# with its own budget, before giving up and letting Gemini catch it.
 # gpt-oss-120b was the measured warmth runner-up; 8b-instant is the last resort.
 GROQ_CHAIN = list(dict.fromkeys([GROQ_MODEL, "openai/gpt-oss-120b", "llama-3.1-8b-instant"]))
 _groq_idx = 0  # sticky: remember which model is currently accepting

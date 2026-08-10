@@ -18,7 +18,7 @@ API_KEY = os.getenv("RIME_API_KEY")
 
 LINE = (
     "Morning, boss. Three nights under six hours, and the report's slipped twice now... "
-    "it survives till tonight, will you? I can block ninety minutes at nine — "
+    "it survives till tonight, will you? I can block ninety minutes at nine, "
     "say the word, Aditya."
 )
 
@@ -26,7 +26,7 @@ CANDIDATES = ["hawa", "nadi"]
 
 
 def sanitize(text: str) -> str:
-    return text.replace(" — ", ", ").replace("—", ", ")
+    return text.replace(", ", ", ").replace("-", ", ")
 
 
 def main() -> None:

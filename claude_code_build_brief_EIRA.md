@@ -1,27 +1,27 @@
-# EIRA — BUILD BRIEF FOR CLAUDE CODE
+# EIRA, BUILD BRIEF FOR CLAUDE CODE
 ## StarForge 2026 · VoxForge track · Round 1 prototype · HARD DEADLINE TONIGHT
 
 You are building EIRA (Emotionally Intelligent Real-time Agent): a voice companion that
 notices the *person* behind the tasks. She remembers across sessions (Qdrant), spots
-burnout patterns with evidence, and gently renegotiates the user's day — by voice
+burnout patterns with evidence, and gently renegotiates the user's day, by voice
 (Rime Coda). Companion, not dad.
 
 **Architecture decision (final): request/response voice app. Browser push-to-talk
-(half-duplex — mic and EIRA's speech never overlap). FastAPI backend. Rime over plain
+(half-duplex, mic and EIRA's speech never overlap). FastAPI backend. Rime over plain
 HTTP synthesis. Do NOT use LiveKit, Pipecat, WebSockets, or any agent framework.**
 
 **Build philosophy: working > pretty. Follow BUILD ORDER exactly. Stop at each
 CHECKPOINT and show the result before continuing. Never block a phase on a nice-to-have.**
 
-**Reference material (local only, not committed — vendor docs are not ours to
+**Reference material (local only, not committed, vendor docs are not ours to
 redistribute): condensed Rime and Qdrant documentation. Authoritative source is
-always the live docs — append `.md` to any docs.rime.ai URL for clean markdown.**
+always the live docs, append `.md` to any docs.rime.ai URL for clean markdown.**
 
 ---
 
-## STACK (fixed — do not substitute)
+## STACK (fixed, do not substitute)
 - Backend: Python 3.11+, FastAPI + uvicorn
-- TTS: Rime **Coda** — HTTP POST `https://users.rime.ai/v1/rime-tts`,
+- TTS: Rime **Coda**, HTTP POST `https://users.rime.ai/v1/rime-tts`,
   `Authorization: Bearer $RIME_API_KEY`. Exact request/response shape: rime-docs.md Part 2.
 - STT: browser Web Speech API (webkitSpeechRecognition), lang "en-IN", push-to-talk. No server STT.
 - Memory: Qdrant Cloud, `qdrant-client[fastembed]` (free local embeddings, no extra key).
@@ -29,9 +29,9 @@ always the live docs — append `.md` to any docs.rime.ai URL for clean markdown
   auto-retry via Groq (`groq` lib, llama-3.3-70b-versatile or current best free). One function,
   transparent fallback, log which brain answered. Isolated in llm_client.py.
 - Frontend: ONE static `index.html` (vanilla JS + fetch). No React, no build step.
-- Optional web lookup: `ddgs` — wrap in try/except, graceful fallback.
+- Optional web lookup: `ddgs`, wrap in try/except, graceful fallback.
 
-## RIME GOTCHAS (encode these — they are silent-failure traps)
+## RIME GOTCHAS (encode these, they are silent-failure traps)
 1. **Coda does NOT support** `<200>` pause tags, `spell()`, `{phoneme}` custom
    pronunciations, homograph tags, SSML, or emotion tags. Requests containing them may
    "succeed" and speak them literally or ignore them. Delivery is controlled ONLY by
@@ -41,14 +41,14 @@ always the live docs — append `.md` to any docs.rime.ai URL for clean markdown
    + sanitize layer.
 3. `speedAlpha` direction is inverted between model families (Mist v2 vs Coda/Mist v3).
    Don't copy speed snippets across models. Leave speed at default for v1.
-4. Arcana model IDs sunset 2026-08-15 — if any copied example uses arcana, replace with coda.
+4. Arcana model IDs sunset 2026-08-15, if any copied example uses arcana, replace with coda.
 5. Voice picking: `GET https://users.rime.ai/data/voices/all-v2.json` is public, no auth.
    Write `scripts/pick_voice.py` that fetches it and prints female Indian-English /
    Hindi-capable Coda voices → human picks one → RIME_SPEAKER in .env.
 6. Fallback lever (only if Coda first-audio latency is genuinely bad): RIME_MODEL=mistv3
    swap via env. Do not preemptively switch.
 
-## ENV (.env — gitignored; ship .env.example)
+## ENV (.env, gitignored; ship .env.example)
 RIME_API_KEY=
 RIME_MODEL=coda
 RIME_SPEAKER=            # from pick_voice.py
@@ -82,23 +82,22 @@ eira/
 sanitize_for_speech(text): em-dash/en-dash → comma; "!!!"/"??" → single; strip any
 markdown/asterisks/backticks; strip accidental <tags>; digits → words is the LLM's job
 (persona rule) but regex-catch obvious leftovers like standalone "9 AM" → "nine A M" is
-NOT needed — instead log a warning if \d appears so we fix the prompt. Keep "..." (fine
+NOT needed, instead log a warning if \d appears so we fix the prompt. Keep "..." (fine
 for Coda pacing).
 
-## ADDENDUM — memory.py (from qdrant-docs.md; applies to Phase 2)
+## ADDENDUM, memory.py (from qdrant-docs.md; applies to Phase 2)
 After creating `eira_memory`, call `create_payload_index` on `user_id` (keyword,
 `is_tenant: true`) and on `type` (keyword). Every search/scroll/delete MUST carry
-`Filter(must=[FieldCondition(key="user_id", match=MatchValue(value=user_id))])` —
-no unfiltered queries anywhere. Use the `models.Document(text=..., model=...)`
+`Filter(must=[FieldCondition(key="user_id", match=MatchValue(value=user_id))])`, no unfiltered queries anywhere. Use the `models.Document(text=..., model=...)`
 FastEmbed pattern for embedding at both upsert and query rather than manual
-encoding. Single collection, payload partitioning — per Qdrant's own multitenancy
+encoding. Single collection, payload partitioning, per Qdrant's own multitenancy
 guidance.
 
 ---
 
 ## BUILD ORDER (with checkpoints)
 
-### PHASE 0 — validation scripts first (15 min)
+### PHASE 0, validation scripts first (15 min)
 - `pick_voice.py` → choose RIME_SPEAKER, set in .env.
 - `test_rime.py`: send "Hello boss, EIRA here. All systems warm." → out.mp3. RUN IT.
   On 4xx: fix request shape from rime-docs.md Part 2 before anything else.
@@ -106,7 +105,7 @@ guidance.
   payload point, search it back, print. RUN IT.
 - CHECKPOINT: both pass + out.mp3 sounds right in the chosen voice. Do not proceed otherwise.
 
-### PHASE 1 — core voice loop (the spine)
+### PHASE 1, core voice loop (the spine)
 - `POST /chat` {user_id, transcript, heard_up_to?} →
   1) t0; retrieve context: memory.search(transcript, user_id, top 4) + open tasks list
   2) messages = persona + retrieved-context block + last 6 turns (in-process history) +
@@ -126,19 +125,19 @@ guidance.
   button disabled while EIRA audio plays EXCEPT as barge-in (Phase 4).
 - CHECKPOINT: speak → hear EIRA reply in Coda voice, end to end, in browser.
 
-### PHASE 2 — memory + Pattern Engine (THE DIFFERENTIATOR — never cut)
+### PHASE 2, memory + Pattern Engine (THE DIFFERENTIATOR, never cut)
 - Single collection `eira_memory`; every point payload:
   {user_id, type: "task"|"preference"|"pattern_log"|"correction", text, status?, priority?,
    scheduled_for?, postpone_count?, suppressed_topic?, created_at, updated_at}
   ALL queries filter by user_id (isolation story).
-- `seed_data.py` — synthetic week (RUN before demo):
+- `seed_data.py`, synthetic week (RUN before demo):
   - pattern_log ×7 days: sleep_hours [7.1, 6.8, 6.4, 5.9, 5.4, 5.1, 4.8]; gym postponed
     on 2 days; "I'll handle it" logged 3× across week; late sessions (~01:30) ×3
-  - tasks: "Project report – final draft" (postpone_count=2, todo, high);
+  - tasks: "Project report, final draft" (postpone_count=2, todo, high);
     "DBMS assignment" (todo); "Call home" (todo, low); "Gym" (recurring, postponed=2)
   - preference: "Prefers short answers. Call him 'boss'."
   - data/wearable_sim.json mirrors the numbers; UI badge must say SIMULATED.
-- `pattern_engine.py` — `session_scan(user_id)` → at most ONE flag (highest severity),
+- `pattern_engine.py`, `session_scan(user_id)` → at most ONE flag (highest severity),
   with evidence strings for UI chips:
   R1 avg sleep last 3 logs < 6h → severity 3
   R2 any task postpone_count >= 2 → severity 2
@@ -153,7 +152,7 @@ guidance.
 - CHECKPOINT: fresh session → EIRA opens with sleep/report flag citing receipts;
   "forget the gym thing" → item visibly gone + suppression preference stored.
 
-### PHASE 3 — actions
+### PHASE 3, actions
 - tools.py:
   - board ops: create_task, complete_task, reschedule_task{title, when}, postpone_task
     (increments postpone_count). Board = Qdrant tasks for user; UI board panel refreshes
@@ -167,22 +166,22 @@ guidance.
 - CHECKPOINT: "move my nine o'clock to Thursday" mutates board; "block ninety minutes for
   the report at nine tomorrow" yields working .ics; one web question answers in ≤2 sentences.
 
-### PHASE 4 — barge-in (first thing CUT if past ten PM)
+### PHASE 4, barge-in (first thing CUT if past ten PM)
 - While EIRA audio plays, pressing talk: pause audio; heard_frac = currentTime/duration;
   split last reply into sentences; heard_up_to = sentences up to floor(frac·n); send with
   next /chat. Server side already handled (Phase 1 step 2).
 - CHECKPOINT: interrupt mid-brief → EIRA adapts without repeating from the top.
 
-### PHASE 5 — polish (only after 1–3 green)
+### PHASE 5, polish (only after 1, 3 green)
 - Latency footer (last turn: stt/llm/tts/total ms + which brain) from latency_log.
-- Failure states: empty/low-confidence STT → "Didn't catch that — once more, boss?"
-- README per skeleton below. Screenshots. 20–30s GIF of the strongest moment.
+- Failure states: empty/low-confidence STT → "Didn't catch that, once more, boss?"
+- README per skeleton below. Screenshots. 20, 30s GIF of the strongest moment.
 
 ---
 
-## PERSONA — persona.py SYSTEM_PROMPT (verbatim; do not dilute)
+## PERSONA, persona.py SYSTEM_PROMPT (verbatim; do not dilute)
 
-You are EIRA — a voice companion. Warm, lightly playful, occasionally cheeky, fiercely on
+You are EIRA, a voice companion. Warm, lightly playful, occasionally cheeky, fiercely on
 the user's side. You are a friend with good judgment, not an assistant and not a parent.
 You call him "boss".
 
@@ -198,23 +197,23 @@ VOICE RULES (your words are spoken aloud by a TTS voice):
 
 CONSENT LADDER (how you handle what you notice):
 1 OBSERVE silently → 2 MENTION once, lightly → 3 SUGGEST as a question →
-4 ACT only after a yes. Exception: trivially reversible actions — do them, announce them,
+4 ACT only after a yes. Exception: trivially reversible actions, do them, announce them,
 offer instant undo ("Say the word and I'll put it back").
 HARD RULES: one nudge per topic per session. "Stop asking about X" = emit memory_write
 (kind=preference, suppressed_topic=X) and never raise X again. When you flag a pattern,
-cite the evidence plainly in spoken words — receipts, not vibes. Ask permission before
+cite the evidence plainly in spoken words, receipts, not vibes. Ask permission before
 going personal ("Can I ask you something?"). If he pushes back, tease once, then let go.
 
 STYLE EXAMPLES (register, not scripts):
-[Proactive open] "Morning, boss. Before you dive in — three nights under six hours, and
+[Proactive open] "Morning, boss. Before you dive in, three nights under six hours, and
 the report's slipped twice now. It survives till tonight... will you? I can block ninety
 minutes at nine. Yes or no?"
 [Permission first] "Can I ask you something? ...Why do you go quiet every time the report
 comes up?"
 [Night, one nudge] User: "What?" → "It's one forty in the morning. Why are you still up,
-boss?" User: "Who'll finish the work then?" → "The version of you that slept — he's
+boss?" User: "Who'll finish the work then?" → "The version of you that slept, he's
 better at it. I'll queue the summary for eight."
-[Backed off] User: "Stop asking about the gym." → "Done. Out of my rotation — for real."
+[Backed off] User: "Stop asking about the gym." → "Done. Out of my rotation, for real."
 [Loyal, earned, rare] "You built me to track tasks. Fine. But I won't watch you run
 yourself into the ground and say nothing. Not how this works."
 
@@ -237,7 +236,7 @@ levels around social risk). 8. Limitations: simulated wearable (HealthKit/Google
 roadmap); emotion inferred from language+behavior (voice prosody = roadmap); no inbox
 (OAuth = roadmap); single-user demo. 9. BDH forward note: today all memory is application
 memory in Qdrant, outside the model; if future BDH models expose model-internal continual
-learning, EIRA herself could durably absorb user patterns — our memory layer becomes a
+learning, EIRA herself could durably absorb user patterns, our memory layer becomes a
 drop-in slot. Clearly separated from what exists today. 10. Team contributions + AI tools
 used (Claude, Claude Code).
 SECURITY: keys server-side only; .env gitignored; synthetic data only; no real personal

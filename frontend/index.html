@@ -67,7 +67,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 .chip.warn{background:rgba(245,193,99,.11);border-color:rgba(245,193,99,.32);color:var(--amber)}
 .mut{color:var(--faint);font-size:12px;font-style:italic}
 
-/* the aura — EIRA herself */
+/* the aura, EIRA herself */
 #aura{position:relative;width:min(340px,78vw);aspect-ratio:1;display:grid;place-items:center;
   cursor:pointer;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
 #auraGlow{position:absolute;inset:-12%;border-radius:50%;filter:blur(34px);opacity:.5;transition:opacity .5s;
@@ -118,7 +118,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 .t .n{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:2px;font-weight:600}
 .t.e .n{color:var(--primary)}
 .t .x{font-size:14px;color:var(--tx)}
-.t.cut .x::after{content:" — you cut in";color:var(--coral2);font-size:11px;font-style:italic}
+.t.cut .x::after{content:", you cut in";color:var(--coral2);font-size:11px;font-style:italic}
 
 /* ---------- sleep pattern card ---------- */
 #bars{display:flex;align-items:flex-end;gap:7px;height:86px;margin-top:4px}
@@ -226,8 +226,8 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
 </div>
 
 <div id="statusbar">
-  <span><span id="brainDot"></span>Brain: <b id="brain">—</b></span>
-  <span>LLM: <b id="lLlm">—</b>&nbsp;&nbsp;TTS: <b id="lTts">—</b>&nbsp;&nbsp;Total: <b id="lTot">—</b></span>
+  <span><span id="brainDot"></span>Brain: <b id="brain">-</b></span>
+  <span>LLM: <b id="lLlm">-</b>&nbsp;&nbsp;TTS: <b id="lTts">-</b>&nbsp;&nbsp;Total: <b id="lTot">-</b></span>
 </div>
 
 <script>
@@ -293,7 +293,7 @@ function rec(rs){
 function plan(sl,low){
   $("plan").innerHTML=""; $("pN").textContent=sl&&sl.length?sl.length:"";
   if(!sl||!sl.length){$("plan").innerHTML='<li class="mut">ask her to plan your day</li>';return}
-  if(low)$("plan").insertAdjacentHTML("beforeend",'<li class="mut">short on sleep — plan trimmed</li>');
+  if(low)$("plan").insertAdjacentHTML("beforeend",'<li class="mut">short on sleep, plan trimmed</li>');
   sl.forEach(s=>$("plan").insertAdjacentHTML("beforeend",
     `<li class="slot"><em>${esc(s.start)}</em>${esc(s.title)}<span>${s.minutes} min · ${esc(s.why)}</span></li>`));
 }
@@ -372,7 +372,7 @@ async function start(){
   try{
     const d=await(await fetch(`/session/start?user_id=${USER}`)).json();
     apply(d); play(d.audio_b64,()=>st("your turn"));
-  }catch(e){ aura("idle",""); st("backend unreachable — is uvicorn running?"); }
+  }catch(e){ aura("idle",""); st("backend unreachable, is uvicorn running?"); }
 }
 async function send(text,heardUpTo){
   if(!text||!text.trim()){st("didn't catch that... once more?");return}
@@ -398,7 +398,7 @@ function bargeIn(){
 }
 function mkRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){st("no speech recognition — use Chrome");return null}
+  if(!SR){st("no speech recognition, use Chrome");return null}
   const r=new SR(); r.lang="en-IN"; r.interimResults=true; r.continuous=true;
   r.onresult=e=>{heardText="";for(const x of e.results)if(x[0])heardText+=x[0].transcript;
     st(heardText||"listening...")};

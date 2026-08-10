@@ -1,7 +1,7 @@
 """Qdrant memory layer (per build-brief addendum).
 
 Single collection, payload partitioning. user_id is a tenant-keyword index and
-EVERY search/scroll/delete carries the user_id filter — no unfiltered queries
+EVERY search/scroll/delete carries the user_id filter, no unfiltered queries
 anywhere. Embedding at upsert and query goes through the models.Document
 FastEmbed pattern (local inference, no manual encoding).
 """
