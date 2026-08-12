@@ -1,4 +1,4 @@
-# secrets, never commit
+﻿# secrets, never commit
 .env
 
 # python
@@ -15,3 +15,7 @@ scripts/*.mp3
 build_notes_local.md
 rime-docs.md
 qdrant-docs.md
+
+# private planning notes, vault only, never in the submission repo
+finale_master_brief.md
+NIGHT_REPORT.md
