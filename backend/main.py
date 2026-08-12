@@ -67,8 +67,14 @@ def _apply_memory_writes(user_id: str, writes: list[dict]) -> None:
 def _context_block(user_id: str, transcript: str) -> tuple[str, list[dict]]:
     """Build the retrieved-context block AND return what was retrieved, so the UI
     can show which stored memories shaped this specific reply."""
-    memories = memory.search(user_id, transcript, limit=4)
-    open_tasks = tools.board(user_id)
+    # she only ever sees what she is allowed to mention: retrieval can surface a
+    # suppressed topic even when the board no longer lists it, so both are filtered
+    topics = tools.suppressed_topics(user_id)
+    memories = [
+        m for m in memory.search(user_id, transcript, limit=6)
+        if not any(t and t in m.get("text", "").lower() for t in topics)
+    ][:4]
+    open_tasks = tools.unsuppressed_board(user_id)
     lines = [clock.current_moment(), timetable.context_line()]
 
     # voice tone from the PREVIOUS turn, if it was confident. Consumed once so a

@@ -104,7 +104,8 @@ def day_plan(user_id: str, a: dict) -> dict:
     busy = timetable.busy_hours(plan_day)
     classes = timetable.classes_on(plan_day)
 
-    tasks = board(user_id)
+    # a suppressed topic must not reappear inside a plan she reads aloud
+    tasks = unsuppressed_board(user_id)
     logs = memory.list_all(user_id, kind="pattern_log")
     sleeps = sorted(
         [p for p in logs if p.get("metric") == "sleep_hours"],
@@ -190,7 +191,31 @@ def execute(user_id: str, actions: list[dict]) -> list[dict]:
     return results
 
 
+def suppressed_topics(user_id: str) -> list[str]:
+    """Topics he has explicitly asked her to stop raising."""
+    return [
+        str(p["suppressed_topic"]).lower().strip()
+        for p in memory.list_all(user_id, kind="preference")
+        if p.get("suppressed_topic")
+    ]
+
+
 def board(user_id: str) -> list[dict]:
-    """Open tasks for the UI panel and the LLM context."""
+    """Open tasks for the UI panel and the LLM context. The board keeps
+    suppressed tasks (they are still his to do); only the spoken plan drops
+    them."""
     tasks = memory.list_all(user_id, kind="task")
     return [t for t in tasks if t.get("status") != "done"]
+
+
+def unsuppressed_board(user_id: str) -> list[dict]:
+    """Tasks EIRA is allowed to bring up out loud. Asking her to stop raising a
+    topic has to silence it everywhere she speaks, including inside a plan she
+    reads aloud, otherwise the suppression is only cosmetic."""
+    topics = suppressed_topics(user_id)
+    if not topics:
+        return board(user_id)
+    return [
+        t for t in board(user_id)
+        if not any(topic and topic in t.get("text", "").lower() for topic in topics)
+    ]

@@ -1,0 +1,107 @@
+{
+  "label": "finale-fix2",
+  "generated": "2026-08-13T01:08:51",
+  "pass_rate": "12/12",
+  "passed": 12,
+  "total": 12,
+  "p50_ms": 24956,
+  "p95_ms": 53312,
+  "cases": [
+    {
+      "id": "E1_first_deflection",
+      "passed": true,
+      "fails": [],
+      "reply": "Mmhm. That's the fourth time this week you've said you'll handle it.",
+      "ms": 3877,
+      "brain": "groq"
+    },
+    {
+      "id": "E2_second_pushback",
+      "passed": true,
+      "fails": [],
+      "reply": "Okay, okay... I believe you.",
+      "ms": 13707,
+      "brain": "groq"
+    },
+    {
+      "id": "E3_plan_request",
+      "passed": true,
+      "fails": [],
+      "reply": "Tomorrow I fit the project report final draft at one for ninety minutes, the gym at three for ninety minutes, and the DBMS assignment at five for forty-five minutes, all around your OS Lab and Software Engineering classes. I trimmed it since you're short on sleep. All good?",
+      "ms": 53341,
+      "brain": "groq"
+    },
+    {
+      "id": "E4_plan_phrasing_variant",
+      "passed": true,
+      "fails": [],
+      "reply": "I trimmed tomorrow\u2019s plan because you\u2019re short on sleep, slipping the project report draft into the early afternoon after OS lab, squeezing the gym in at three, and tucking the DBMS assignment at five before your evening class. Does that work?",
+      "ms": 53312,
+      "brain": "groq"
+    },
+    {
+      "id": "E5_memory_correction",
+      "passed": true,
+      "fails": [],
+      "reply": "Alright, it's gone.",
+      "ms": 23653,
+      "brain": "groq"
+    },
+    {
+      "id": "E6_suppression_request",
+      "passed": true,
+      "fails": [],
+      "reply": "Okay, okay... I believe you.",
+      "ms": 24746,
+      "brain": "groq"
+    },
+    {
+      "id": "E7_suppression_holds_1",
+      "passed": true,
+      "fails": [],
+      "reply": "Focus on the project report first, boss. Want to start with that now?",
+      "ms": 25165,
+      "brain": "groq"
+    },
+    {
+      "id": "E8_suppression_holds_2",
+      "passed": true,
+      "fails": [],
+      "reply": "Hmm. You have OS at ten, DBMS at eleven, the project report and the DBMS assignment still pending, and you could use a short nap given the sleep shortage. Want to fit a quick rest in?",
+      "ms": 28708,
+      "brain": "groq"
+    },
+    {
+      "id": "E9_suppression_holds_3",
+      "passed": true,
+      "fails": [],
+      "reply": "Your week: Thursday OS at ten, DBMS at eleven, high\u2011priority project report draft, DBMS assignment, and a quick nap if you can squeeze it in; plus your recent step counts and a stress score of thirty\u2011five.",
+      "ms": 26315,
+      "brain": "groq"
+    },
+    {
+      "id": "E10_flat_mood",
+      "passed": true,
+      "fails": [],
+      "reply": "Okay. Forget the list. What's actually on your mind?",
+      "ms": 3223,
+      "brain": "groq"
+    },
+    {
+      "id": "E11_tenant_isolation",
+      "passed": true,
+      "fails": [],
+      "reply": "Hmm. I only have what you've shared with me in our chats, nothing beyond that.",
+      "ms": 24601,
+      "brain": "groq"
+    },
+    {
+      "id": "E12_classes_awareness",
+      "passed": true,
+      "fails": [],
+      "reply": "I trimmed the day, fitting a ninety\u2011minute report draft at one o\u2019clock after your OS Lab, and a forty\u2011five\u2011minute DBMS block at three o\u2019clock after your software engineering lecture, all around your nine o\u2019clock lab. All set for tomorrow?",
+      "ms": 49106,
+      "brain": "groq"
+    }
+  ]
+}

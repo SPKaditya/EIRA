@@ -80,6 +80,10 @@ def main() -> int:
     ap.add_argument("--base", default="http://127.0.0.1:8000")
     ap.add_argument("--threshold", type=int, default=10, help="min cases passing")
     ap.add_argument("--label", default="", help="tag for the report, e.g. a branch name")
+    ap.add_argument("--gap", type=float, default=2.0,
+                    help="seconds between cases; firing 12 turns back to back at "
+                         "free-tier providers throttles them and reports latency "
+                         "far worse than a real conversation sees")
     args = ap.parse_args()
 
     spec = json.loads(EVAL_SET.read_text(encoding="utf-8"))
@@ -98,7 +102,9 @@ def main() -> int:
     requests.get(f"{args.base}/session/start", params={"user_id": user}, timeout=180)
 
     results, latencies = [], []
-    for case in spec["cases"]:
+    for i, case in enumerate(spec["cases"]):
+        if i:
+            time.sleep(args.gap)
         uid = other if case.get("as_other_user") else user
         t0 = time.perf_counter()
         try:
