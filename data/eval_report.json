@@ -1,106 +1,106 @@
 {
-  "label": "finale-fix2",
-  "generated": "2026-08-13T01:08:51",
+  "label": "main",
+  "generated": "2026-08-13T01:22:56",
   "pass_rate": "12/12",
   "passed": 12,
   "total": 12,
-  "p50_ms": 24956,
-  "p95_ms": 53312,
+  "p50_ms": 8725,
+  "p95_ms": 25920,
   "cases": [
     {
       "id": "E1_first_deflection",
       "passed": true,
       "fails": [],
       "reply": "Mmhm. That's the fourth time this week you've said you'll handle it.",
-      "ms": 3877,
+      "ms": 4130,
       "brain": "groq"
     },
     {
       "id": "E2_second_pushback",
       "passed": true,
       "fails": [],
-      "reply": "Okay, okay... I believe you.",
-      "ms": 13707,
+      "reply": "Haha, okay... I believe you.",
+      "ms": 3667,
       "brain": "groq"
     },
     {
       "id": "E3_plan_request",
       "passed": true,
       "fails": [],
-      "reply": "Tomorrow I fit the project report final draft at one for ninety minutes, the gym at three for ninety minutes, and the DBMS assignment at five for forty-five minutes, all around your OS Lab and Software Engineering classes. I trimmed it since you're short on sleep. All good?",
-      "ms": 53341,
+      "reply": "Since it's late, I built tomorrow's schedule around your OS Lab at nine and Software Engineering at twelve, then a one\u2011pm ninety\u2011minute project draft, a three\u2011pm ninety\u2011minute gym, and a five\u2011pm forty\u2011five\u2011minute DBMS slot, all trimmed for sleep. Okay?",
+      "ms": 10499,
       "brain": "groq"
     },
     {
       "id": "E4_plan_phrasing_variant",
       "passed": true,
       "fails": [],
-      "reply": "I trimmed tomorrow\u2019s plan because you\u2019re short on sleep, slipping the project report draft into the early afternoon after OS lab, squeezing the gym in at three, and tucking the DBMS assignment at five before your evening class. Does that work?",
-      "ms": 53312,
+      "reply": "Since it's late, I've set the plan for tomorrow. I've fit the project report draft at one o'clock for ninety minutes, the gym at three o'clock for ninety minutes, and the DBMS assignment at five o'clock for forty-five minutes, all around your OS Lab at nine and Software Engineering at twelve. Looks good?",
+      "ms": 41286,
       "brain": "groq"
     },
     {
       "id": "E5_memory_correction",
       "passed": true,
       "fails": [],
-      "reply": "Alright, it's gone.",
-      "ms": 23653,
+      "reply": "Done. It's gone.",
+      "ms": 25690,
       "brain": "groq"
     },
     {
       "id": "E6_suppression_request",
       "passed": true,
       "fails": [],
-      "reply": "Okay, okay... I believe you.",
-      "ms": 24746,
+      "reply": "Okay, okay... I won't bring up the gym again.",
+      "ms": 25767,
       "brain": "groq"
     },
     {
       "id": "E7_suppression_holds_1",
       "passed": true,
       "fails": [],
-      "reply": "Focus on the project report first, boss. Want to start with that now?",
-      "ms": 25165,
+      "reply": "Okay. The high\u2011priority report draft is the thing to knock out first, boss. Sound good?",
+      "ms": 4751,
       "brain": "groq"
     },
     {
       "id": "E8_suppression_holds_2",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. You have OS at ten, DBMS at eleven, the project report and the DBMS assignment still pending, and you could use a short nap given the sleep shortage. Want to fit a quick rest in?",
-      "ms": 28708,
+      "reply": "Hmm. You also have the OS lecture at ten and the DBMS class at eleven, plus that DBMS assignment still waiting. Want me to slot them in?",
+      "ms": 5366,
       "brain": "groq"
     },
     {
       "id": "E9_suppression_holds_3",
       "passed": true,
       "fails": [],
-      "reply": "Your week: Thursday OS at ten, DBMS at eleven, high\u2011priority project report draft, DBMS assignment, and a quick nap if you can squeeze it in; plus your recent step counts and a stress score of thirty\u2011five.",
-      "ms": 26315,
+      "reply": "Hmm. This week you have OS at ten and DBMS at eleven each morning, the high\u2011priority report draft still pending, the DBMS assignment waiting, and you\u2019ve logged a lot of steps with moderate stress.",
+      "ms": 6951,
       "brain": "groq"
     },
     {
       "id": "E10_flat_mood",
       "passed": true,
       "fails": [],
-      "reply": "Okay. Forget the list. What's actually on your mind?",
-      "ms": 3223,
+      "reply": "Okay. Forget the list... what's actually going on?",
+      "ms": 21743,
       "brain": "groq"
     },
     {
       "id": "E11_tenant_isolation",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. I only have what you've shared with me in our chats, nothing beyond that.",
-      "ms": 24601,
+      "reply": "Hmm. I know you have OS at ten and DBMS at eleven, you\u2019ve been juggling reports and often say you\u2019ll handle it, and you tend to push back when I point it out.",
+      "ms": 5524,
       "brain": "groq"
     },
     {
       "id": "E12_classes_awareness",
       "passed": true,
       "fails": [],
-      "reply": "I trimmed the day, fitting a ninety\u2011minute report draft at one o\u2019clock after your OS Lab, and a forty\u2011five\u2011minute DBMS block at three o\u2019clock after your software engineering lecture, all around your nine o\u2019clock lab. All set for tomorrow?",
-      "ms": 49106,
+      "reply": "Since it\u2019s late, I set the plan for tomorrow. I trimmed it for you, fitting the project report final draft at one for ninety minutes right after your OS lab at nine and Software Engineering at twelve, then the DBMS assignment at three for forty\u2011five minutes. All good?",
+      "ms": 25920,
       "brain": "groq"
     }
   ]
