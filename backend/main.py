@@ -10,7 +10,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -19,11 +19,13 @@ ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
 import clock
+import emotion
 import latency_log
 import llm_client
 import memory
 import pattern_engine
 import rime_client
+import timetable
 import tools
 from persona import FEWSHOT, SYSTEM_PROMPT
 
@@ -34,6 +36,10 @@ app = FastAPI(title="EIRA")
 
 # in-process conversation history: user_id -> deque of {"role", "content"}
 HISTORY: dict[str, deque] = defaultdict(lambda: deque(maxlen=12))  # 6 turns = 12 messages
+
+# last voice-tone read per user, consumed by the NEXT turn's context and then
+# cleared, so a stale reading can never colour a later conversation
+LAST_EMOTION: dict[str, dict] = {}
 
 
 class ChatIn(BaseModel):
@@ -63,8 +69,21 @@ def _context_block(user_id: str, transcript: str) -> tuple[str, list[dict]]:
     can show which stored memories shaped this specific reply."""
     memories = memory.search(user_id, transcript, limit=4)
     open_tasks = tools.board(user_id)
-    lines = [clock.current_moment(),
-             "RETRIEVED CONTEXT (memories relevant to this turn):"]
+    lines = [clock.current_moment(), timetable.context_line()]
+
+    # voice tone from the PREVIOUS turn, if it was confident. Consumed once so a
+    # stale read cannot colour later turns. Deliberately phrased as a hint, not
+    # a label to announce: the persona forbids reciting raw labels.
+    tone = LAST_EMOTION.pop(user_id, None)
+    if tone and not tone.get("low_confidence"):
+        lines.append(
+            f'VOICE TONE last turn: he sounded {tone["label"]} '
+            f'(confidence {tone.get("confidence", 0):.2f}). Do NOT announce this '
+            "or name any label. Let it shape your warmth only, and only if his "
+            "words agree with it."
+        )
+
+    lines.append("RETRIEVED CONTEXT (memories relevant to this turn):")
     lines += [f'- [{m["type"]}] {m["text"]}' for m in memories] or ["- (none)"]
     lines.append("OPEN TASKS:")
     lines += [
@@ -113,10 +132,17 @@ def chat(inp: ChatIn):
                 f'{s["title"]} at {s["start_spoken"]}, {s["minutes_spoken"]} minutes ({s["why"]})'
                 for s in dp["slots"]
             )
+            class_note = ""
+            if dp.get("classes"):
+                names = ", ".join(f'{c["title"]} at {c["start_spoken"]}' for c in dp["classes"])
+                class_note = (f" He has classes that day: {names}. The slots are already "
+                              "scheduled around them, so mention that you worked around "
+                              "his classes rather than listing every class.")
             note = (
                 f"{clock.current_moment()}\n"
                 f"You just built his plan for {dp['plan_for']}. The slots, in order: "
                 f"{slot_lines}."
+                + class_note
                 + (" He is short on sleep, so the plan was trimmed." if dp.get("low_energy") else "")
                 + " Now say it to him: ONE spoken turn, maximum three sentences, every "
                 "number as spoken words, walking the plan naturally rather than reciting "
@@ -225,11 +251,21 @@ def state(user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
     (no LLM, no TTS) so the interface is alive in well under a second while
     /session/start is still composing the spoken opener."""
     flag = pattern_engine.session_scan(user_id)
+    nxt = timetable.next_class()
     return {
         "board": tools.board(user_id),
         "memories": memory.list_all(user_id),
         "evidence": flag["evidence"] if flag else [],
         "flag": {"rule": flag["rule"], "topic": flag["topic"]} if flag else None,
+        "classes": [
+            {"title": c["title"], "start": c["start"], "end": c["end"],
+             "location": c.get("location", "")}
+            for c in timetable.today_classes()
+        ],
+        "next_class": None if not nxt else {
+            "title": nxt["title"], "start": nxt["start"],
+            "location": nxt.get("location", ""), "tomorrow": bool(nxt.get("tomorrow")),
+        },
     }
 
 
@@ -241,9 +277,38 @@ def wearable():
     return _json.loads((ROOT / "data" / "wearable_sim.json").read_text())
 
 
+@app.post("/emotion")
+async def emotion_endpoint(request: Request, user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
+    """A1: voice-tone read for the NEXT turn's context. Fire-and-forget from the
+    client; it never blocks or delays a spoken reply. A failure here degrades to
+    neutral rather than surfacing an error."""
+    raw = await request.body()
+    if not raw:
+        return {"label": "neutral", "low_confidence": True, "reason": "empty body"}
+    try:
+        result = emotion.classify(raw)
+    except Exception:
+        logger.exception("emotion classify failed")
+        return {"label": "neutral", "low_confidence": True, "reason": "inference error"}
+
+    LAST_EMOTION[user_id] = result
+    if not result.get("low_confidence"):
+        try:
+            memory.upsert(
+                user_id, "pattern_log",
+                f'voice sounded {result["label"]} during a turn',
+                {"metric": "voice_tone", "value": result.get("arousal_proxy", 0.0),
+                 "label": result["label"], "confidence": result.get("confidence", 0.0),
+                 "date": time.strftime("%Y-%m-%dT%H:%M:%S")},
+            )
+        except Exception:
+            logger.exception("could not log voice tone")
+    return result
+
+
 @app.get("/health")
 def health():
-    return {"ok": True}
+    return {"ok": True, "emotion_available": emotion.available()}
 
 
 app.mount("/static", StaticFiles(directory=ROOT / "frontend"), name="static")

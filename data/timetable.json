@@ -1,0 +1,30 @@
+{
+  "_comment": "Weekly class grid. PLACEHOLDER CONTENT, replace with the real timetable. Times are 24h local.",
+  "owner": "aditya",
+  "week": {
+    "Monday": [
+      {"start": "09:00", "end": "10:00", "title": "Computer Networks", "location": "LT-3"},
+      {"start": "11:00", "end": "12:00", "title": "DBMS", "location": "LT-1"},
+      {"start": "14:00", "end": "16:00", "title": "DBMS Lab", "location": "Lab-2"}
+    ],
+    "Tuesday": [
+      {"start": "10:00", "end": "11:00", "title": "Operating Systems", "location": "LT-2"},
+      {"start": "12:00", "end": "13:00", "title": "Software Engineering", "location": "LT-4"}
+    ],
+    "Wednesday": [
+      {"start": "09:00", "end": "10:00", "title": "Computer Networks", "location": "LT-3"},
+      {"start": "11:00", "end": "13:00", "title": "Networks Lab", "location": "Lab-1"},
+      {"start": "15:00", "end": "16:00", "title": "Economics", "location": "LT-5"}
+    ],
+    "Thursday": [
+      {"start": "10:00", "end": "11:00", "title": "Operating Systems", "location": "LT-2"},
+      {"start": "11:00", "end": "12:00", "title": "DBMS", "location": "LT-1"}
+    ],
+    "Friday": [
+      {"start": "09:00", "end": "11:00", "title": "OS Lab", "location": "Lab-3"},
+      {"start": "12:00", "end": "13:00", "title": "Software Engineering", "location": "LT-4"}
+    ],
+    "Saturday": [],
+    "Sunday": []
+  }
+}

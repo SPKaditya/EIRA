@@ -87,15 +87,22 @@ def day_plan(user_id: str, a: dict) -> dict:
     Postponed-and-high-priority first (avoidance costs the most), low-energy
     slots when sleep is short. Clock-aware: never schedules a slot in the past;
     late at night the whole plan rolls to tomorrow and says so."""
-    from datetime import datetime
+    from datetime import datetime, timedelta
 
     import clock
+    import timetable
 
     now = datetime.now()
     if clock.is_late(now):
         plan_for, start_clock = "tomorrow", 9
+        plan_day = (now + timedelta(days=1)).strftime("%A")
     else:
         plan_for, start_clock = "today", max(9, now.hour + 1)
+        plan_day = now.strftime("%A")
+
+    # never schedule work on top of a class
+    busy = timetable.busy_hours(plan_day)
+    classes = timetable.classes_on(plan_day)
 
     tasks = board(user_id)
     logs = memory.list_all(user_id, kind="pattern_log")
@@ -115,6 +122,14 @@ def day_plan(user_id: str, a: dict) -> dict:
     for t in ordered:
         heavy = int(t.get("postpone_count") or 0) >= 2 or t.get("priority") == "high"
         mins = 90 if heavy else 45
+        span = 2 if heavy else 1
+
+        # walk past any hour a class occupies, so nothing collides
+        while hour <= 20 and any((hour + k) in busy for k in range(span)):
+            hour += 1
+        if hour > 20:
+            break
+
         slots.append({
             "title": t["text"],
             "start": f"{hour:02d}:00",
@@ -124,15 +139,21 @@ def day_plan(user_id: str, a: dict) -> dict:
             "why": "postponed twice, front-loaded" if int(t.get("postpone_count") or 0) >= 2
                    else ("high priority" if t.get("priority") == "high" else "fits the gap"),
         })
-        hour += 2 if heavy else 1
+        hour += span
         if low_energy and len(slots) >= 3:
             break
 
     return {
         "type": "day_plan", "ok": True, "slots": slots,
         "plan_for": plan_for,
+        "plan_day": plan_day,
         "low_energy": low_energy,
         "avg_sleep": round(avg_sleep, 1) if avg_sleep is not None else None,
+        "classes": [
+            {"title": c["title"], "start": c["start"], "end": c["end"],
+             "start_spoken": c["start_spoken"], "location": c.get("location", "")}
+            for c in classes
+        ],
     }
 
 

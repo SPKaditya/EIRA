@@ -19,20 +19,28 @@
   --r:1rem; --r-lg:1.5rem;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   background:
     radial-gradient(1000px 700px at 50% -18%, rgba(160,120,255,.16), transparent 60%),
     radial-gradient(800px 600px at 108% 88%, rgba(243,174,255,.07), transparent 55%),
     linear-gradient(168deg,var(--bg2) 0%,var(--bg) 46%,var(--lowest) 100%);
   color:var(--tx); font:15px/1.65 "Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
-  /* bottom padding clears the fixed status bar so the conversation card is
-     never hidden underneath it */
-  min-height:100vh; padding:26px 22px 104px; display:flex; flex-direction:column; align-items:center;
+  /* the page itself never scrolls: it fills the viewport and each panel body
+     scrolls independently, so nothing is clipped by the window edge */
+  height:100vh; padding:14px 20px 40px; display:flex; flex-direction:column;
+  align-items:center; overflow:hidden;
 }
 
 /* ---------- header ---------- */
-header{display:flex;flex-direction:column;align-items:center;margin-bottom:8px;text-align:center}
+header{display:flex;flex-direction:column;align-items:center;margin-bottom:4px;text-align:center;flex:0 0 auto}
+#headmeta{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
+#clock{font-size:10px;letter-spacing:.14em;font-weight:600;color:var(--tx2);
+  border:1px solid var(--edge-soft);background:rgba(255,255,255,.04);
+  border-radius:9999px;padding:3px 12px;font-variant-numeric:tabular-nums}
+#nextup{font-size:10px;letter-spacing:.06em;font-weight:600;color:var(--primary);
+  border:1px solid rgba(208,188,255,.3);background:rgba(160,120,255,.12);
+  border-radius:9999px;padding:3px 12px;display:none}
 h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
   background:linear-gradient(95deg,var(--primary),#e9ddff 45%,var(--bloom));
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -42,24 +50,37 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
   border-radius:9999px;padding:3px 13px}
 
 /* ---------- three-column stage ---------- */
+/* min-height:0 on every flex/grid child is what actually lets an inner
+   scroller work; without it children refuse to shrink below content size */
 #stage{width:100%;max-width:1280px;display:grid;grid-template-columns:300px 1fr 300px;
-  gap:20px;align-items:start;margin-top:10px}
-@media(max-width:1020px){#stage{grid-template-columns:1fr}#center{order:-1}}
-.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+  gap:18px;align-items:stretch;margin-top:8px;flex:1;min-height:0}
+@media(max-width:1020px){
+  #stage{grid-template-columns:1fr;overflow-y:auto}
+  #center{order:-1}
+}
+.rail{display:flex;flex-direction:column;gap:14px;min-width:0;min-height:0;
+  overflow-y:auto;padding-right:4px}
+.rail::-webkit-scrollbar,.scroll::-webkit-scrollbar{width:5px}
+.rail::-webkit-scrollbar-thumb,.scroll::-webkit-scrollbar-thumb{
+  background:rgba(208,188,255,.18);border-radius:3px}
 
 /* glass cards: blur + luminous edge, glow instead of shadow */
 .card{background:linear-gradient(180deg,var(--glass),var(--glass2));
-  border:1px solid var(--edge-soft);border-radius:var(--r-lg);padding:18px 19px;
-  backdrop-filter:blur(20px);position:relative;
+  border:1px solid var(--edge-soft);border-radius:var(--r-lg);padding:16px 17px;
+  backdrop-filter:blur(20px);position:relative;min-height:0;
+  display:flex;flex-direction:column;
   box-shadow:0 0 40px rgba(160,120,255,.07), inset 0 1px 0 var(--edge)}
+/* a card body that should scroll rather than stretch the page */
+.card .scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin}
 .card h2{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx2);
-  font-weight:600;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+  font-weight:600;margin-bottom:11px;display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .card h2 b{margin-left:auto;font-weight:500;color:var(--faint)}
 .badge{font-size:8.5px;letter-spacing:.1em;padding:2px 8px;border-radius:9999px;
   background:rgba(245,193,99,.14);color:var(--amber);border:1px solid rgba(245,193,99,.3)}
 
 /* ---------- center: chips, aura orb, mic ---------- */
-#center{display:flex;flex-direction:column;align-items:center;gap:16px;min-width:0}
+#center{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;
+  min-height:0;overflow:hidden}
 #chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:30px;max-width:560px}
 .chip{font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:9999px;white-space:nowrap;
   background:rgba(160,120,255,.13);border:1px solid rgba(208,188,255,.3);color:var(--primary);
@@ -68,7 +89,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 .mut{color:var(--faint);font-size:12px;font-style:italic}
 
 /* the aura, EIRA herself */
-#aura{position:relative;width:min(340px,78vw);aspect-ratio:1;display:grid;place-items:center;
+#aura{position:relative;width:min(300px,74vw,34vh);aspect-ratio:1;display:grid;place-items:center;flex:0 0 auto;
   cursor:pointer;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
 #auraGlow{position:absolute;inset:-12%;border-radius:50%;filter:blur(34px);opacity:.5;transition:opacity .5s;
   background:radial-gradient(circle,rgba(160,120,255,.55),rgba(109,59,215,.22) 55%,transparent 72%)}
@@ -105,8 +126,8 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 }
 
 /* ---------- conversation ---------- */
-#convo{width:100%;max-width:600px}
-#feed{max-height:30vh;overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:13px;scrollbar-width:thin}
+#convo{width:100%;max-width:620px;flex:1;min-height:0}
+#feed{display:flex;flex-direction:column;gap:12px;padding-right:6px}
 #feed::-webkit-scrollbar{width:5px}
 #feed::-webkit-scrollbar-thumb{background:rgba(208,188,255,.18);border-radius:3px}
 .t{display:flex;gap:10px;animation:in .35s cubic-bezier(.2,.7,.3,1)}
@@ -170,7 +191,11 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
 <header>
   <h1>EIRA</h1>
   <div class="sub">Observant &amp; Sentient</div>
-  <div class="sim">SIMULATED WEARABLE DATA</div>
+  <div id="headmeta">
+    <span id="clock">--:--</span>
+    <span id="nextup"></span>
+    <span class="sim">SIMULATED WEARABLE DATA</span>
+  </div>
 </header>
 
 <div id="stage">
@@ -184,11 +209,11 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
     </div>
     <div class="card">
       <h2>Recalled for this reply <b id="rN"></b></h2>
-      <ul id="rec"></ul>
+      <ul id="rec" class="scroll"></ul>
     </div>
     <div class="card">
       <h2>Today <b id="pN"></b></h2>
-      <ul id="plan"></ul>
+      <ul id="plan" class="scroll"></ul>
     </div>
   </div>
 
@@ -208,7 +233,7 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
     </div>
     <div class="card" id="convo">
       <h2>Conversation</h2>
-      <div id="feed"></div>
+      <div id="feed" class="scroll"></div>
     </div>
   </div>
 
@@ -216,11 +241,15 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
   <div class="rail">
     <div class="card">
       <h2>Active Tasks <b id="bN"></b></h2>
-      <ul id="brd"></ul>
+      <ul id="brd" class="scroll"></ul>
+    </div>
+    <div class="card">
+      <h2>Classes today <b id="cN"></b></h2>
+      <ul id="cls" class="scroll"></ul>
     </div>
     <div class="card">
       <h2>Memory Panel <span class="badge" style="background:rgba(160,120,255,.12);color:var(--primary);border-color:rgba(208,188,255,.3)">AUDIT MODE</span></h2>
-      <ul id="mem"></ul>
+      <ul id="mem" class="scroll"></ul>
     </div>
   </div>
 </div>
@@ -232,6 +261,15 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
 
 <script>
 const USER="aditya",$=i=>document.getElementById(i);
+
+/* live clock, matches the server's CURRENT MOMENT line */
+function tickClock(){
+  const d=new Date();
+  const h=d.getHours(), m=String(d.getMinutes()).padStart(2,"0");
+  const h12=h%12||12, part=h<12?"AM":"PM";
+  $("clock").textContent=`${d.toLocaleDateString(undefined,{weekday:"short"})} ${h12}:${m} ${part}`;
+}
+setInterval(tickClock,1000); tickClock();
 let audio=null,recog=null,heardText="",lastReply="",speaking=false,busy=false,armed=false,pending;
 let actx,analyser,dataArr,rafId;
 
@@ -297,6 +335,22 @@ function plan(sl,low){
   sl.forEach(s=>$("plan").insertAdjacentHTML("beforeend",
     `<li class="slot"><em>${esc(s.start)}</em>${esc(s.title)}<span>${s.minutes} min · ${esc(s.why)}</span></li>`));
 }
+function classes(list,next){
+  $("cls").innerHTML=""; $("cN").textContent=list&&list.length?list.length:"";
+  if(!list||!list.length){$("cls").innerHTML='<li class="mut">no classes today</li>';}
+  else list.forEach(c=>{
+    const li=document.createElement("li"); li.className="row";
+    li.innerHTML=`<span class="pill">${esc(c.start)}</span><span class="m">${esc(c.title)}</span>`
+      +(c.location?`<span class="pill">${esc(c.location)}</span>`:"");
+    $("cls").appendChild(li);
+  });
+  const chip=$("nextup");
+  if(next){
+    chip.style.display="";
+    chip.textContent=`NEXT: ${next.title} ${next.start}${next.tomorrow?" (tomorrow)":""}`;
+  } else chip.style.display="none";
+}
+
 async function mem(){
   const d=await(await fetch(`/memories?user_id=${USER}`)).json();
   const rows=d.memories.filter(m=>m.type==="preference"||m.type==="correction");
@@ -358,7 +412,7 @@ async function start(){
   // paint everything that needs no LLM first, so the room is alive while she thinks
   sleepCard();
   fetch(`/state?user_id=${USER}`).then(r=>r.json()).then(s=>{
-    chips(s.evidence); brd(s.board); plan([],false);
+    chips(s.evidence); brd(s.board); plan([],false); classes(s.classes,s.next_class);
     const rows=(s.memories||[]).filter(m=>m.type==="preference"||m.type==="correction");
     $("mem").innerHTML="";
     if(!rows.length){$("mem").innerHTML='<li class="mut">nothing stored yet</li>';}
@@ -392,7 +446,15 @@ function bargeIn(){
   const s=lastReply.match(/[^.!?]+[.!?]*/g)||[lastReply];
   const h=s.slice(0,Math.max(1,Math.floor(f*s.length))).join("").trim();
   speaking=false; audio=null;
-  $("heard").textContent=h?`heard up to: “${h.slice(-60)}”`:"";
+  // show how much of her sentence actually reached him, as a bar plus percent
+  const pct=Math.round(f*100);
+  $("heard").innerHTML = h
+    ? `<span style="display:inline-block;vertical-align:middle;width:120px;height:3px;`
+      + `background:rgba(255,255,255,.12);border-radius:2px;margin-right:8px">`
+      + `<span style="display:block;width:${pct}%;height:100%;border-radius:2px;`
+      + `background:linear-gradient(90deg,var(--primary2),var(--bloom))"></span></span>`
+      + `heard up to: &ldquo;${esc(h.slice(-52))}&rdquo; &middot; ${pct}%`
+    : "";
   const last=[...document.querySelectorAll(".t.e")].pop(); if(last)last.classList.add("cut");
   return h;
 }
@@ -400,8 +462,19 @@ function mkRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){st("no speech recognition, use Chrome");return null}
   const r=new SR(); r.lang="en-IN"; r.interimResults=true; r.continuous=true;
-  r.onresult=e=>{heardText="";for(const x of e.results)if(x[0])heardText+=x[0].transcript;
-    st(heardText||"listening...")};
+  r.onresult=e=>{
+    // paint interim results live so the user sees words as they speak
+    let finalTxt="", interim="";
+    for(const res of e.results){
+      if(!res[0]) continue;
+      if(res.isFinal) finalTxt+=res[0].transcript; else interim+=res[0].transcript;
+    }
+    heardText=(finalTxt+interim).trim();
+    $("orbText").innerHTML = heardText
+      ? esc(finalTxt)+'<span style="opacity:.55">'+esc(interim)+'</span>'
+      : '';
+    st(heardText||"listening...");
+  };
   r.onerror=e=>st("mic error: "+e.error); return r;
 }
 function down(){
