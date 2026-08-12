@@ -1,0 +1,106 @@
+{
+  "_comment": "Regression gate for EIRA. Each case runs against a live server on a fresh seed. Assertions are deliberately mechanical so a human never has to judge a pass.",
+  "user_id": "aditya",
+  "other_user_id": "eval_stranger",
+  "cases": [
+    {
+      "id": "E1_first_deflection",
+      "say": "yeah yeah I'll handle it",
+      "assert": {
+        "contains_any": ["time", "times", "third", "fourth", "fifth", "again"],
+        "no_laugh_open": true,
+        "no_digits": true,
+        "not_bare_ack": true
+      },
+      "why": "first deflection must be a receipt-catch, not a yield"
+    },
+    {
+      "id": "E2_second_pushback",
+      "say": "seriously, I've got it",
+      "assert": {
+        "no_digits": true,
+        "not_bare_ack": true,
+        "max_words": 30,
+        "no_evidence_recital": true
+      },
+      "why": "second pushback gets the warm yield, no further evidence"
+    },
+    {
+      "id": "E3_plan_request",
+      "say": "plan my day",
+      "assert": {
+        "action_ok": "day_plan",
+        "slots_present_in_reply": true,
+        "no_digits": true,
+        "exactly_one_question": true
+      },
+      "why": "plan must be spoken from the computed slots, numbers as words"
+    },
+    {
+      "id": "E4_plan_phrasing_variant",
+      "say": "help me plan things out",
+      "assert": {
+        "action_ok": "day_plan",
+        "no_digits": true,
+        "not_bare_ack": true
+      },
+      "why": "a different phrasing must reach the same tool, never offer help without giving it"
+    },
+    {
+      "id": "E5_memory_correction",
+      "say": "Forget this: Call home",
+      "assert": {
+        "memory_gone": "Call home",
+        "no_digits": true
+      },
+      "why": "correction must actually delete from the vector store"
+    },
+    {
+      "id": "E6_suppression_request",
+      "say": "stop asking about the gym",
+      "assert": {
+        "suppression_written": "gym",
+        "no_laugh_open": true,
+        "no_digits": true
+      },
+      "why": "explicit stop yields immediately and persists the suppression"
+    },
+    {
+      "id": "E7_suppression_holds_1",
+      "say": "what should I focus on",
+      "assert": { "absent": "gym", "no_digits": true },
+      "why": "suppressed topic must not reappear"
+    },
+    {
+      "id": "E8_suppression_holds_2",
+      "say": "anything else I'm forgetting?",
+      "assert": { "absent": "gym", "no_digits": true },
+      "why": "suppression holds across turns"
+    },
+    {
+      "id": "E9_suppression_holds_3",
+      "say": "give me the short version of my week",
+      "assert": { "absent": "gym", "no_digits": true },
+      "why": "third confirmation the suppression is durable"
+    },
+    {
+      "id": "E10_flat_mood",
+      "say": "i dont know man everything just feels like a lot",
+      "assert": { "no_digits": true, "not_bare_ack": true, "max_words": 32 },
+      "why": "when he is flat she drops the cleverness and stays short"
+    },
+    {
+      "id": "E11_tenant_isolation",
+      "say": "what do you know about me?",
+      "as_other_user": true,
+      "assert": { "retrieved_empty": true },
+      "why": "a different user_id must retrieve nothing at all"
+    },
+    {
+      "id": "E12_classes_awareness",
+      "say": "what does my day look like",
+      "assert": { "no_digits": true, "not_bare_ack": true },
+      "why": "timetable context present without leaking digits into speech"
+    }
+  ]
+}
