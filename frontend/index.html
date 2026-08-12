@@ -81,7 +81,10 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 /* ---------- center: chips, aura orb, mic ---------- */
 #center{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;
   min-height:0;overflow:hidden}
-#chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:30px;max-width:560px}
+/* chips sit above the orb, never behind it: their own stacking context plus a
+   cap on rows so a third receipt cannot overlap the aura */
+#chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;min-height:28px;
+  max-width:600px;position:relative;z-index:3;flex:0 0 auto}
 .chip{font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:9999px;white-space:nowrap;
   background:rgba(160,120,255,.13);border:1px solid rgba(208,188,255,.3);color:var(--primary);
   backdrop-filter:blur(8px);animation:in .4s ease}
@@ -89,9 +92,10 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 .mut{color:var(--faint);font-size:12px;font-style:italic}
 
 /* the aura, EIRA herself */
-#aura{position:relative;width:min(300px,74vw,34vh);aspect-ratio:1;display:grid;place-items:center;flex:0 0 auto;
+/* the orb yields vertical space on short windows so the conversation stays readable */
+#aura{position:relative;width:min(300px,74vw,30vh);aspect-ratio:1;display:grid;place-items:center;flex:0 0 auto;
   cursor:pointer;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
-#auraGlow{position:absolute;inset:-12%;border-radius:50%;filter:blur(34px);opacity:.5;transition:opacity .5s;
+#auraGlow{position:absolute;inset:-12%;border-radius:50%;filter:blur(34px);opacity:.5;transition:opacity .5s;z-index:0;
   background:radial-gradient(circle,rgba(160,120,255,.55),rgba(109,59,215,.22) 55%,transparent 72%)}
 #orb{position:absolute;inset:0;border-radius:50%;transition:transform .12s ease-out;
   background:radial-gradient(circle at 36% 28%, #cfc0f4 0%, #a078ff 34%, #6d3bd7 68%, #3c2087 100%);
@@ -126,7 +130,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:10px;padding-left:10px;
 }
 
 /* ---------- conversation ---------- */
-#convo{width:100%;max-width:620px;flex:1;min-height:0}
+#convo{width:100%;max-width:620px;flex:1;min-height:120px}
 #feed{display:flex;flex-direction:column;gap:12px;padding-right:6px}
 #feed::-webkit-scrollbar{width:5px}
 #feed::-webkit-scrollbar-thumb{background:rgba(208,188,255,.18);border-radius:3px}
@@ -346,7 +350,9 @@ function classes(list,next){
   });
   const chip=$("nextup");
   if(next){
-    chip.style.display="";
+    // must be an explicit value: clearing the inline style falls back to the
+    // stylesheet's display:none and the chip silently stays hidden
+    chip.style.display="inline-block";
     chip.textContent=`NEXT: ${next.title} ${next.start}${next.tomorrow?" (tomorrow)":""}`;
   } else chip.style.display="none";
 }

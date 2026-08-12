@@ -1,0 +1,99 @@
+{
+  "label": "finale",
+  "generated": "2026-08-13T01:11:52",
+  "pace_seconds": 6.0,
+  "p50_ms": 4430,
+  "p95_ms": 19973,
+  "wall_seconds": 104.2,
+  "silent_turns": [],
+  "digit_leaks": [],
+  "turns": [
+    {
+      "turn": "session start",
+      "said": "(page load)",
+      "reply": "Hmm. Your recovery is down twenty four percent. Maybe a short walk could lift it?",
+      "total_ms": 4430,
+      "llm_ms": 1397,
+      "tts_ms": 2282,
+      "brain": "groq",
+      "audio_bytes": 164480,
+      "flag": "R4"
+    },
+    {
+      "turn": "deflection",
+      "said": "yeah yeah I'll handle it",
+      "reply": "Mmhm. That's the fourth time this week you've said you'll handle it.",
+      "total_ms": 4138,
+      "llm_ms": 1252,
+      "tts_ms": 1980,
+      "brain": "groq",
+      "audio_bytes": 115200,
+      "actions": [],
+      "digits": false
+    },
+    {
+      "turn": "second pushback",
+      "said": "seriously, I've got it",
+      "reply": "Haha, okay... I believe you.",
+      "total_ms": 3973,
+      "llm_ms": 1324,
+      "tts_ms": 1742,
+      "brain": "groq",
+      "audio_bytes": 96000,
+      "actions": [],
+      "digits": false
+    },
+    {
+      "turn": "correction",
+      "said": "Forget this: Call home",
+      "reply": "Okay, it's gone.",
+      "total_ms": 3726,
+      "llm_ms": 1242,
+      "tts_ms": 1257,
+      "brain": "groq",
+      "audio_bytes": 42880,
+      "actions": [
+        "memory_delete"
+      ],
+      "digits": false
+    },
+    {
+      "turn": "plan",
+      "said": "plan my day",
+      "reply": "Tomorrow I've fit the project report final draft at one, the gym at three, and the DBMS assignment at five, all working around your OS Lab and Software Engineering classes. I trimmed it since you're short on sleep. Alright?",
+      "total_ms": 25324,
+      "llm_ms": 19667,
+      "tts_ms": 4269,
+      "brain": "groq",
+      "audio_bytes": 362880,
+      "actions": [
+        "day_plan"
+      ],
+      "digits": false
+    },
+    {
+      "turn": "suppression",
+      "said": "stop asking about the gym",
+      "reply": "Done. Out of my rotation, for real.",
+      "total_ms": 4565,
+      "llm_ms": 1403,
+      "tts_ms": 2063,
+      "brain": "groq",
+      "audio_bytes": 126080,
+      "actions": [],
+      "digits": false
+    },
+    {
+      "turn": "suppression holds",
+      "said": "what should I focus on",
+      "reply": "Hmm. The project report, boss\u2014high priority and already delayed. Knock it out before the OS class, then tackle the DBMS assignment.",
+      "total_ms": 19973,
+      "llm_ms": 15587,
+      "tts_ms": 3452,
+      "brain": "groq",
+      "audio_bytes": 292480,
+      "actions": [],
+      "digits": false
+    }
+  ]
+}
