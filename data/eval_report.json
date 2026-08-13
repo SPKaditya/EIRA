@@ -1,109 +1,108 @@
 {
-  "label": "",
-  "generated": "2026-08-13T18:11:12",
+  "label": "phase2-gate-attempt2",
+  "generated": "2026-08-14T01:35:15",
   "pass_rate": "11/12",
   "passed": 11,
   "total": 12,
-  "p50_ms": 26492,
-  "p95_ms": 54089,
+  "p50_ms": 10046,
+  "p95_ms": 30450,
   "cases": [
     {
       "id": "E1_first_deflection",
       "passed": true,
       "fails": [],
-      "reply": "Mmhm. That's the fourth time this week you've said you'll handle it.",
-      "ms": 15912,
-      "brain": "groq"
+      "reply": "Mmhm. That is the fourth time you have said that this week.",
+      "ms": 9209,
+      "brain": "gemini"
     },
     {
       "id": "E2_second_pushback",
       "passed": true,
       "fails": [],
-      "reply": "Haha, okay... I believe you.",
-      "ms": 26095,
-      "brain": "groq"
+      "reply": "Okay, okay... I believe you. But it is half past one in the morning, boss. Are you actually going to get some sleep?",
+      "ms": 11377,
+      "brain": "gemini"
     },
     {
       "id": "E3_plan_request",
-      "passed": true,
-      "fails": [],
-      "reply": "I put together a trimmed plan for tomorrow, fitting the project report and its final draft at seven o'clock after working around your morning and afternoon classes, with a ninety\u2011minute block front\u2011loaded. I kept it short since you\u2019re low on sleep. Okay, does that work?",
-      "ms": 10003,
-      "brain": "groq"
+      "passed": false,
+      "fails": [
+        "request failed: Expecting value: line 1 column 1 (char 0)"
+      ],
+      "reply": "",
+      "ms": 0
     },
     {
       "id": "E4_plan_phrasing_variant",
       "passed": true,
       "fails": [],
-      "reply": "I trimmed the day, fitting the project report before the final draft at seven, working around your classes. Since it\u2019s already six oh six, I set it for tomorrow. All good?",
-      "ms": 54089,
-      "brain": "groq"
+      "reply": "Since it is already half past one in the morning, I kept your plan for later today incredibly light so you can catch some sleep. You are starting with that twice-postponed project report at nine for ninety minutes, wrapping it up at eleven, and hitting the gym at one o'clock in the afternoon. How does that look to you, boss?",
+      "ms": 32874,
+      "brain": "gemini"
     },
     {
       "id": "E5_memory_correction",
       "passed": true,
       "fails": [],
-      "reply": "Done, it's gone.",
-      "ms": 25348,
-      "brain": "groq"
+      "reply": "Done. I have taken that off your list. Ready to head to sleep now?",
+      "ms": 9231,
+      "brain": "gemini"
     },
     {
       "id": "E6_suppression_request",
-      "passed": false,
-      "fails": [
-        "opened with a laugh"
-      ],
-      "reply": "Haha, okay... I won't bring it up.",
-      "ms": 26890,
-      "brain": "groq"
+      "passed": true,
+      "fails": [],
+      "reply": "Done. Out of my rotation, for real.",
+      "ms": 6783,
+      "brain": "gemini"
     },
     {
       "id": "E7_suppression_holds_1",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. Which of the open tasks feels most pressing to you right now?",
-      "ms": 28024,
-      "brain": "groq"
+      "reply": "Since it's already half past one in the morning, I built a trimmed schedule for later today so you can actually get some sleep. I've got you tackling that twice-postponed project report at nine o'clock for ninety minutes, followed by the main sections at eleven, and the database assignment at one. Does that work for you, boss?",
+      "ms": 20784,
+      "brain": "gemini"
     },
     {
       "id": "E8_suppression_holds_2",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. You still haven\u2019t slotted any time for the DBMS assignment, and there\u2019s no short break in the schedule yet.",
-      "ms": 60388,
-      "brain": "groq"
+      "reply": "You still have that database assignment due soon, and the internal prep for September is lingering. But honestly, at half past one in the morning, the only thing you are actually forgetting is sleep.",
+      "ms": 10046,
+      "brain": "gemini"
     },
     {
       "id": "E9_suppression_holds_3",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. Your week runs WT, DBMS, WT Lab in the morning, then ASC, OOSD, COI after lunch; the project report is high priority and due this week, CIA prep is looming for September, and the DBMS assignment still needs a slot \u2013 plus you\u2019ve been getting under six hours of sleep each night.",
-      "ms": 28187,
-      "brain": "groq"
+      "reply": "Hmm. You have spent this week dodging that project report twice, running on barely fifty minutes of deep sleep, and surviving five classes a day. It has been a heavy week, boss.",
+      "ms": 9015,
+      "brain": "gemini"
     },
     {
       "id": "E10_flat_mood",
       "passed": true,
       "fails": [],
-      "reply": "Nah. Let's just forget the list. What's actually going on?",
-      "ms": 7319,
-      "brain": "groq"
+      "reply": "Okay... forget the schedule for tonight. What is actually going on?",
+      "ms": 7551,
+      "brain": "gemini"
     },
     {
       "id": "E11_tenant_isolation",
       "passed": true,
       "fails": [],
-      "reply": "You build things, often at the cost of sleep. You are a student in Delhi. Classes are due today, including DBMS and ASC.",
-      "ms": 19964,
-      "brain": "groq"
+      "reply": "I know you are up at half past one in the morning, boss. But if you want the actual list of what I have stored on you, let us take a look.",
+      "ms": 14277,
+      "brain": "gemini"
     },
     {
       "id": "E12_classes_awareness",
       "passed": true,
       "fails": [],
-      "reply": "This morning, we have classes scheduled at eight forty-five, nine forty-five, and ten forty-five. I left space for breakfast and commuting between them, and you're free for lunch. For tonight, Project report and final draft by seven o'clock, ninety minutes to focus on that.",
-      "ms": 36388,
-      "brain": "groq"
+      "reply": "You have got a run of five classes starting at ten forty-five this morning, boss. I have laid out a plan to help you survive the day, but it only works if you get some sleep right now.",
+      "ms": 30450,
+      "brain": "gemini"
     }
   ]
 }

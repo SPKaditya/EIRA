@@ -467,13 +467,17 @@ async function send(text,heardUpTo){
   if(!text||!text.trim()){st("didn't catch that... once more?");return}
   if(busy)return; busy=true;
   turn("Aditya",text); aura("think","THINKING"); $("orbText").textContent=""; st("");
+  // dead-air cover: if the turn takes long (tool loop out in the world),
+  // play a short pre-synthesized ack so the room never goes silent
+  const ackT=setTimeout(()=>{ if(busy){ try{ new Audio("/ack").play().catch(()=>{}); }catch(e){} } },2500);
   try{
     const body={user_id:USER,transcript:text};
     if(heardUpTo!==undefined)body.heard_up_to=heardUpTo;
     const d=await(await fetch("/chat",{method:"POST",
       headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})).json();
+    clearTimeout(ackT);
     busy=false; apply(d); play(d.audio_b64,()=>st("your turn"));
-  }catch(e){ busy=false; aura("idle",""); st("failed: "+e.message); }
+  }catch(e){ clearTimeout(ackT); busy=false; aura("idle",""); st("failed: "+e.message); }
 }
 function bargeIn(){
   const f=audio.duration?Math.min(1,audio.currentTime/audio.duration):0;

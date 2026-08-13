@@ -107,6 +107,46 @@ Keys needed: [Rime](https://app.rime.ai/tokens) ·
 [Groq](https://console.groq.com/keys) ·
 [Gemini](https://aistudio.google.com/apikey).
 
+## What she can do (agentic layer)
+
+- **Bounded native tool loop** — OpenAI-style function calling, hard-capped at
+  three iterations, graceful spoken exit at the cap. No agent framework; the
+  tool layer is MCP-compatible by design and migrating it to MCP servers is the
+  next architectural step.
+- **Live world grounding** — current time and real Open-Meteo weather, spoken
+  with every number as words.
+- **Direct-question preemption** — "what time is it?" is answered *now*, even
+  mid-plan-flow; a grounded question is never deferred to finish a monologue.
+- **Google Calendar, capability-gated** — read, create, and move real events on
+  your own calendar once connected (below); without credentials the tools are
+  simply absent and she says so gracefully.
+- **Gmail, designed and gated** — draft-confirm send flow (she speaks the draft,
+  sends only on an explicit yes) ships as design; enable alongside calendar.
+- **Honest limits** — Testing-mode OAuth tokens expire weekly; free-tier LLM
+  budgets are real (the chain walks sibling models by design: a
+  deprecated-but-serving primary with a tested migration path behind it).
+
+## Connect Google (optional — calendar & email tools)
+
+EIRA runs fully without this; connecting takes about two minutes and switches
+her calendar/email tools live on your own account:
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → **New Project** (fresh, dedicated).
+2. APIs & Services → Library → enable **Google Calendar API** and **Gmail API**.
+3. Google Auth Platform → **Branding**: app name "EIRA Local", your email as
+   support and developer contact.
+4. **Audience**: External, publishing status stays **Testing**, and add your own
+   gmail under Test users (skipping this gives Error 403 access_denied).
+5. **Data Access** → add scopes `https://www.googleapis.com/auth/calendar` and
+   `https://www.googleapis.com/auth/gmail.modify`.
+6. **Clients** → Create client → **Desktop app** → download the JSON → save it
+   as `credentials.json` in the repo root → restart the server.
+
+First run pops a one-time browser consent (the "unverified app" screen is
+expected in Testing mode — continue through it). `token.json` appears after
+consent; both files are gitignored and never leave your machine. Honest limit:
+Testing-mode refresh tokens expire after seven days, so you re-consent weekly.
+
 ## Engineering decisions worth defending
 
 **Memory is multi-tenant by construction.** One Qdrant collection with payload

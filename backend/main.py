@@ -18,6 +18,7 @@ from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
+import agent_loop
 import clock
 import emotion
 import gcal
@@ -34,6 +35,45 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s
 logger = logging.getLogger("eira")
 
 app = FastAPI(title="EIRA")
+
+ACK_LINES = ["Checking that for you...", "One second...", "Let me look."]
+ACK_DIR = ROOT / "data"
+
+
+@app.on_event("startup")
+def _startup() -> None:
+    if not gcal.available():
+        logger.info(
+            "Calendar/Gmail: not connected. To enable: drop credentials.json "
+            "in the repo root and restart (see README -> Connect Google)."
+        )
+    else:
+        logger.info("Calendar/Gmail: credentials present, tools active.")
+
+    # dead-air cover: pre-synthesize short ack clips once, off the boot path,
+    # so a tool-loop turn can play one instantly while the loop completes
+    def _pregen():
+        for i, line in enumerate(ACK_LINES):
+            p = ACK_DIR / f"ack_{i}.mp3"
+            if p.exists():
+                continue
+            try:
+                mp3, _ = rime_client.speak(line)
+                p.write_bytes(mp3)
+            except Exception:
+                logger.warning("ack pregen failed for %r (non-fatal)", line)
+    import threading
+    threading.Thread(target=_pregen, daemon=True).start()
+
+
+@app.get("/ack")
+def ack():
+    """A random pre-synthesized acknowledgment clip, for dead-air cover."""
+    import random
+    clips = sorted(ACK_DIR.glob("ack_*.mp3"))
+    if not clips:
+        return {"ok": False}
+    return FileResponse(random.choice(clips), media_type="audio/mp3")
 
 # in-process conversation history: user_id -> deque of {"role", "content"}
 HISTORY: dict[str, deque] = defaultdict(lambda: deque(maxlen=12))  # 6 turns = 12 messages
@@ -83,6 +123,15 @@ def _context_block(user_id: str, transcript: str) -> tuple[str, list[dict]]:
     if gcal.available():
         lines.append(gcal.context_line())
         lines.append(gcal.capability_line())
+    else:
+        # deferred-setup grace: asked about calendar/email while unconnected,
+        # she says so in-register, two-minute fix, never an error dump
+        lines.append(
+            "CALENDAR AND EMAIL: not connected on this machine yet. If he asks "
+            "about his calendar or email, say warmly that it isn't linked yet "
+            "and takes about two minutes to set up (the README shows how), "
+            "then move on. Do not invent events or emails."
+        )
 
     # voice tone from the PREVIOUS turn, if it was confident. Consumed once so a
     # stale read cannot colour later turns. Deliberately phrased as a hint, not
@@ -116,6 +165,36 @@ def chat(inp: ChatIn):
     t0 = time.perf_counter()
     user_id = inp.user_id
 
+    # Phase 2 routing: direct grounded questions (time/date/weather/calendar/
+    # email) preempt everything — answered NOW through the bounded tool loop,
+    # and any pending day-plan follow-up is suppressed this turn. Everything
+    # else stays on the legacy single-shot JSON path the harness depends on.
+    if agent_loop.is_direct_question(inp.transcript):
+        context, retrieved = _context_block(user_id, inp.transcript)
+        loop_msgs = [*HISTORY[user_id],
+                     {"role": "user", "content": f"{context}\n\n{inp.transcript}"}]
+        reply, tools_used, brain, iters = agent_loop.run_loop(SYSTEM_PROMPT, loop_msgs)
+        audio_b64, tts_ms = "", 0.0
+        if reply:
+            try:
+                mp3, tts_ms = rime_client.speak(rime_client.sanitize_for_speech(reply))
+                audio_b64 = base64.b64encode(mp3).decode()
+            except Exception:
+                logger.exception("TTS failed on loop turn")
+        HISTORY[user_id].append({"role": "user", "content": inp.transcript})
+        HISTORY[user_id].append({"role": "assistant", "content": reply})
+        latency = latency_log.log_turn(
+            route="tool_loop", llm_ms=0, tts_ms=round(tts_ms),
+            total_ms=round((time.perf_counter() - t0) * 1000), brain=brain,
+        )
+        return {
+            "reply": reply, "audio_b64": audio_b64,
+            "actions_executed": [{"type": "tool_loop", "ok": True,
+                                  "tools": tools_used, "iterations": iters}],
+            "retrieved": retrieved, "board": tools.board(user_id),
+            "latency": latency,
+        }
+
     msgs: list[dict] = [*FEWSHOT]
     if inp.heard_up_to is not None:
         msgs.append({
@@ -128,7 +207,17 @@ def chat(inp: ChatIn):
     msgs.extend(HISTORY[user_id])
     msgs.append({"role": "user", "content": inp.transcript})
 
-    result, brain, llm_ms = llm_client.chat(SYSTEM_PROMPT, msgs)
+    # the last line of defense: if every brain in both providers fails, the
+    # turn degrades to a spoken in-register beat, never a naked 500 — "no turn
+    # ever dropped" has to hold even on total provider failure
+    try:
+        result, brain, llm_ms = llm_client.chat(SYSTEM_PROMPT, msgs)
+    except Exception:
+        logger.exception("all brains failed; serving graceful fallback turn")
+        result = {"reply": "Ugh, hang on... my head's jammed for a second. "
+                           "Say that once more?",
+                  "actions": [], "memory_writes": []}
+        brain, llm_ms = "none", 0.0
     reply = result["reply"]
 
     executed = tools.execute(user_id, result["actions"])
@@ -222,9 +311,15 @@ def session_start(user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
     # Demo-night reversal: Gemini degraded to 46s openers (slow + bad-JSON
     # retries), and "she's waking up" cannot take a minute. The fast chain with
     # few-shot is warm enough; Gemini stays as the automatic fallback only.
-    result, brain, llm_ms = llm_client.chat(
-        SYSTEM_PROMPT, [*FEWSHOT, {"role": "user", "content": note}]
-    )
+    try:
+        result, brain, llm_ms = llm_client.chat(
+            SYSTEM_PROMPT, [*FEWSHOT, {"role": "user", "content": note}]
+        )
+    except Exception:
+        logger.exception("all brains failed on session start; warm static open")
+        result = {"reply": "Morning. Give me a breath to wake up properly... "
+                           "what's on your mind?"}
+        brain, llm_ms = "none", 0.0
     reply = result["reply"]
     HISTORY[user_id].clear()
     HISTORY[user_id].append({"role": "assistant", "content": reply})
