@@ -69,15 +69,16 @@ Browser  ── push-to-talk (Web Speech API), barge-in, audio-reactive orb
    │  transcript
    ▼
 FastAPI ──► Qdrant Cloud     memory: tasks · preferences · pattern logs
-        ──► Pattern Engine   R1 sleep · R2 postponed · R3 deflection
+        ──► Pattern Engine   R1 sleep · R2 postponed · R3 deflection · R4 HRV · R5 resting HR
         ──► LLM              Groq chain ⇄ Gemini key pool (auto-failover)
         ──► Rime Coda TTS    HTTP synthesis, voice: nadi
+        ──► /emotion         wav2vec2 speech emotion, confidence-gated, off the critical path
    ▼
 mp3 + receipts + recalled memories + board + day plan
 ```
 
 Deliberately no LiveKit, no WebSockets, no agent framework. Request/response and
-half-duplex, with barge-in handled client-side. The whole system is about 1,100
+half-duplex, with barge-in handled client-side. The whole system is about 2,800
 lines you can read in one sitting.
 
 **Barge-in:** press the orb while she's talking and she stops, works out how much
@@ -149,6 +150,10 @@ Testing-mode refresh tokens expire after seven days, so you re-consent weekly.
 
 ## Engineering decisions worth defending
 
+**The persona is regression-tested like code:** a 12-case eval harness plus agent
+smoke tests ship in `scripts/` with the latest green report in `data/` — they
+caught seven real bugs this week, including a tone violation.
+
 **Memory is multi-tenant by construction.** One Qdrant collection with payload
 partitioning, `user_id` indexed as a tenant keyword (`is_tenant=True`) per
 Qdrant's own multitenancy guidance. Every search, scroll, payload update and
@@ -184,8 +189,10 @@ call degrades to a normal turn instead of an error.
 
 - **Wearable data is simulated** (`data/wearable_sim.json`), badged as such in the
   interface. HealthKit / Google Fit integration is roadmap, not built.
-- **Emotion is inferred from language and behaviour**, not from voice prosody.
-  No acoustic stress analysis is performed, despite what a voice demo might imply.
+- **A speech-emotion classifier (wav2vec2, confidence-gated) is built and exposed
+  at `/emotion`, but deliberately not fused into replies yet** — at ~62% benchmark
+  accuracy, a confidently wrong tone read is worse than none. Fusion ships behind
+  an ear-tested checkpoint.
 - **Single-user demo.** The isolation mechanism is real and tested; the demo drives
   one tenant.
 - **Speech recognition is the browser's**, so accuracy varies with microphone and
