@@ -2,27 +2,27 @@
  {
   "case": "A time answered via loop, no plan talk",
   "passed": true,
-  "note": "tools=[] reply=\"It's one thirteen at night.\""
+  "note": "tools=[] reply=\"I couldn't finish that one... want me to keep trying?\""
  },
  {
   "case": "B time mid-plan, plan not re-monologued",
   "passed": true,
-  "note": "reply=\"It's one fourteen at night.\""
+  "note": "reply=\"I couldn't finish that one... want me to keep trying?\""
  },
  {
   "case": "C live weather spoken",
-  "passed": true,
-  "note": "tools=['get_weather'] reply='Twenty-nine degrees and overcast in Delhi.'"
+  "passed": false,
+  "note": "tools=[] reply=\"I couldn't finish that one... want me to keep trying?\""
  },
  {
   "case": "D loop cap holds (<= 3 iterations)",
   "passed": true,
-  "note": "iterations=3"
+  "note": "iterations=2"
  },
  {
   "case": "E unconnected calendar handled gracefully",
-  "passed": true,
-  "note": "reply='It isn\u2019t linked yet, takes about two minutes to set up (the README sho'"
+  "passed": false,
+  "note": "reply=\"I couldn't finish that one... want me to keep trying?\""
  },
  {
   "case": "F zero digits across all spoken replies",

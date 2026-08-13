@@ -1,107 +1,106 @@
 {
-  "label": "phase2-gate-attempt2",
-  "generated": "2026-08-14T01:35:15",
-  "pass_rate": "11/12",
-  "passed": 11,
+  "label": "freeze-final-d889570",
+  "generated": "2026-08-14T01:40:56",
+  "pass_rate": "12/12",
+  "passed": 12,
   "total": 12,
-  "p50_ms": 10046,
-  "p95_ms": 30450,
+  "p50_ms": 9984,
+  "p95_ms": 24023,
   "cases": [
     {
       "id": "E1_first_deflection",
       "passed": true,
       "fails": [],
-      "reply": "Mmhm. That is the fourth time you have said that this week.",
-      "ms": 9209,
+      "reply": "Mmhm. That is the fourth time this week you have told me you will handle it.",
+      "ms": 8712,
       "brain": "gemini"
     },
     {
       "id": "E2_second_pushback",
       "passed": true,
       "fails": [],
-      "reply": "Okay, okay... I believe you. But it is half past one in the morning, boss. Are you actually going to get some sleep?",
-      "ms": 11377,
+      "reply": "Alright, alright... I believe you. It is your call.",
+      "ms": 7528,
       "brain": "gemini"
     },
     {
       "id": "E3_plan_request",
-      "passed": false,
-      "fails": [
-        "request failed: Expecting value: line 1 column 1 (char 0)"
-      ],
-      "reply": "",
-      "ms": 0
+      "passed": true,
+      "fails": [],
+      "reply": "Hmm. Since it is already past one in the morning, I set up a trimmed-down flow for later today so you can actually sleep. We are finally tackling that project report at nine o'clock and eleven, then hitting the gym at one. Sound like a plan, boss?",
+      "ms": 18328,
+      "brain": "gemini"
     },
     {
       "id": "E4_plan_phrasing_variant",
       "passed": true,
       "fails": [],
-      "reply": "Since it is already half past one in the morning, I kept your plan for later today incredibly light so you can catch some sleep. You are starting with that twice-postponed project report at nine for ninety minutes, wrapping it up at eleven, and hitting the gym at one o'clock in the afternoon. How does that look to you, boss?",
-      "ms": 32874,
+      "reply": "Since it's already past one in the morning, I set this up for tomorrow so you can actually get some sleep. We'll tackle that postponed project report at nine for ninety minutes, follow up with the next block at eleven, and get you to the gym by one. How does that feel, boss?",
+      "ms": 27073,
       "brain": "gemini"
     },
     {
       "id": "E5_memory_correction",
       "passed": true,
       "fails": [],
-      "reply": "Done. I have taken that off your list. Ready to head to sleep now?",
-      "ms": 9231,
+      "reply": "Done. 'Call home' is gone.",
+      "ms": 12407,
       "brain": "gemini"
     },
     {
       "id": "E6_suppression_request",
       "passed": true,
       "fails": [],
-      "reply": "Done. Out of my rotation, for real.",
-      "ms": 6783,
+      "reply": "Done. Gym is out of my rotation, for real.",
+      "ms": 6683,
       "brain": "gemini"
     },
     {
       "id": "E7_suppression_holds_1",
       "passed": true,
       "fails": [],
-      "reply": "Since it's already half past one in the morning, I built a trimmed schedule for later today so you can actually get some sleep. I've got you tackling that twice-postponed project report at nine o'clock for ninety minutes, followed by the main sections at eleven, and the database assignment at one. Does that work for you, boss?",
-      "ms": 20784,
+      "reply": "Right now? Sleep. But once you are actually awake today, it has to be that project report... we both know it has been sitting there too long.",
+      "ms": 10101,
       "brain": "gemini"
     },
     {
       "id": "E8_suppression_holds_2",
       "passed": true,
       "fails": [],
-      "reply": "You still have that database assignment due soon, and the internal prep for September is lingering. But honestly, at half past one in the morning, the only thing you are actually forgetting is sleep.",
-      "ms": 10046,
+      "reply": "Just the DBMS assignment... it is due soon but it can wait until you have cleared today's classes. Let us focus on surviving Friday first.",
+      "ms": 6846,
       "brain": "gemini"
     },
     {
       "id": "E9_suppression_holds_3",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. You have spent this week dodging that project report twice, running on barely fifty minutes of deep sleep, and surviving five classes a day. It has been a heavy week, boss.",
-      "ms": 9015,
+      "reply": "You managed about seven thousand steps yesterday, but fifty minutes of deep sleep is pretty rough, boss. Mostly, you have just been dodging that project report all week.",
+      "ms": 10606,
       "brain": "gemini"
     },
     {
       "id": "E10_flat_mood",
       "passed": true,
       "fails": [],
-      "reply": "Okay... forget the schedule for tonight. What is actually going on?",
-      "ms": 7551,
+      "reply": "Hey... let us forget about the reports and the classes for tonight. It is almost two in the morning, boss. What is really making things heavy right now?",
+      "ms": 9434,
       "brain": "gemini"
     },
     {
       "id": "E11_tenant_isolation",
       "passed": true,
       "fails": [],
-      "reply": "I know you are up at half past one in the morning, boss. But if you want the actual list of what I have stored on you, let us take a look.",
-      "ms": 14277,
+      "reply": "Hmm. Right now, on paper? Almost nothing, we have got a clean slate. But I know you are Aditya, you build things here in Delhi, and you are currently talking to me at twenty minutes to two in the morning.",
+      "ms": 9867,
       "brain": "gemini"
     },
     {
       "id": "E12_classes_awareness",
       "passed": true,
       "fails": [],
-      "reply": "You have got a run of five classes starting at ten forty-five this morning, boss. I have laid out a plan to help you survive the day, but it only works if you get some sleep right now.",
-      "ms": 30450,
+      "reply": "Since it's almost two in the morning, I trimmed your plan for later today to protect your sleep, starting with that twice-postponed project report draft at nine o'clock. We'll do another ninety-minute block on it at eleven, and then wrap up with forty-five minutes of CIA preparation at one in the afternoon. Does that work for you, boss?",
+      "ms": 24023,
       "brain": "gemini"
     }
   ]
