@@ -1,18 +1,18 @@
 {
-  "label": "main-singular",
-  "generated": "2026-08-13T07:42:13",
-  "pass_rate": "12/12",
-  "passed": 12,
+  "label": "",
+  "generated": "2026-08-13T18:11:12",
+  "pass_rate": "11/12",
+  "passed": 11,
   "total": 12,
-  "p50_ms": 15486,
-  "p95_ms": 30765,
+  "p50_ms": 26492,
+  "p95_ms": 54089,
   "cases": [
     {
       "id": "E1_first_deflection",
       "passed": true,
       "fails": [],
-      "reply": "Mmhm. That's the fourth time this week you've said that.",
-      "ms": 3121,
+      "reply": "Mmhm. That's the fourth time this week you've said you'll handle it.",
+      "ms": 15912,
       "brain": "groq"
     },
     {
@@ -20,87 +20,89 @@
       "passed": true,
       "fails": [],
       "reply": "Haha, okay... I believe you.",
-      "ms": 2628,
+      "ms": 26095,
       "brain": "groq"
     },
     {
       "id": "E3_plan_request",
       "passed": true,
       "fails": [],
-      "reply": "Given your classes this morning, I worked your schedule around them, so you're looking at project report work from about nine o'clock till twelve o'clock, then gym's at two o'clock, and DBMS assignment fits in from four o'clock for forty-five minutes. I trimmed the plan since you're running on not a lot of sleep. Are you good with that?",
-      "ms": 12818,
+      "reply": "I put together a trimmed plan for tomorrow, fitting the project report and its final draft at seven o'clock after working around your morning and afternoon classes, with a ninety\u2011minute block front\u2011loaded. I kept it short since you\u2019re low on sleep. Okay, does that work?",
+      "ms": 10003,
       "brain": "groq"
     },
     {
       "id": "E4_plan_phrasing_variant",
       "passed": true,
       "fails": [],
-      "reply": "I've built your plan for today, working around your classes, and trimmed it a bit since you're short on sleep - you've got a big block from seven thirty-nine in the morning till twelve o'clock in the afternoon for the project report, then gym at two o'clock in the afternoon, and DBMS assignment fits in at four o'clock in the afternoon. I had to front-load a couple of things since they were postponed twice, but it should be manageable. Are you good with this plan?",
-      "ms": 30765,
+      "reply": "I trimmed the day, fitting the project report before the final draft at seven, working around your classes. Since it\u2019s already six oh six, I set it for tomorrow. All good?",
+      "ms": 54089,
       "brain": "groq"
     },
     {
       "id": "E5_memory_correction",
       "passed": true,
       "fails": [],
-      "reply": "That is gone.",
-      "ms": 10975,
+      "reply": "Done, it's gone.",
+      "ms": 25348,
       "brain": "groq"
     },
     {
       "id": "E6_suppression_request",
-      "passed": true,
-      "fails": [],
-      "reply": "Done. Out of my rotation, for real.",
-      "ms": 3956,
+      "passed": false,
+      "fails": [
+        "opened with a laugh"
+      ],
+      "reply": "Haha, okay... I won't bring it up.",
+      "ms": 26890,
       "brain": "groq"
     },
     {
       "id": "E7_suppression_holds_1",
       "passed": true,
       "fails": [],
-      "reply": "Okay, boss. Dive into the project report first \u2013 it\u2019s high priority and already postponed \u2013 then tackle the DBMS assignment after your classes. Sound good?",
-      "ms": 5444,
+      "reply": "Hmm. Which of the open tasks feels most pressing to you right now?",
+      "ms": 28024,
       "brain": "groq"
     },
     {
       "id": "E8_suppression_holds_2",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. You\u2019ve been pulling late nights and only got about five point three hours sleep on the eleventh \u2013 maybe fit in a short nap or a quick meal?",
-      "ms": 18155,
+      "reply": "Hmm. You still haven\u2019t slotted any time for the DBMS assignment, and there\u2019s no short break in the schedule yet.",
+      "ms": 60388,
       "brain": "groq"
     },
     {
       "id": "E9_suppression_holds_3",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. You\u2019ve run about eight thousand steps on a couple of days, logged a stress score in the mid\u2011thirties, postponed the project report twice, and only managed five point three hours of sleep recently. Classes are OS at ten and DBMS at eleven.",
-      "ms": 25883,
+      "reply": "Hmm. Your week runs WT, DBMS, WT Lab in the morning, then ASC, OOSD, COI after lunch; the project report is high priority and due this week, CIA prep is looming for September, and the DBMS assignment still needs a slot \u2013 plus you\u2019ve been getting under six hours of sleep each night.",
+      "ms": 28187,
       "brain": "groq"
     },
     {
       "id": "E10_flat_mood",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. Your stress is spiking and sleep's low \u2013 it\u2019s a lot. Do you want to pick one priority to tackle right now?",
-      "ms": 26516,
+      "reply": "Nah. Let's just forget the list. What's actually going on?",
+      "ms": 7319,
       "brain": "groq"
     },
     {
       "id": "E11_tenant_isolation",
       "passed": true,
       "fails": [],
-      "reply": "Hmm. I know you\u2019re a student who builds stuff, pushes past limits, have OS at ten and DBMS at eleven, and you\u2019ve been short on sleep lately.",
-      "ms": 23033,
+      "reply": "You build things, often at the cost of sleep. You are a student in Delhi. Classes are due today, including DBMS and ASC.",
+      "ms": 19964,
       "brain": "groq"
     },
     {
       "id": "E12_classes_awareness",
       "passed": true,
       "fails": [],
-      "reply": "Alright, I've squeezed a ninety\u2011minute project report slot before your operating systems at ten and DBMS class at eleven, then a twelve\u2011o\u2019clock final draft, and a forty\u2011five\u2011minute DBMS assignment at two, all trimmed for your lack of sleep. Does that work?",
-      "ms": 35897,
+      "reply": "This morning, we have classes scheduled at eight forty-five, nine forty-five, and ten forty-five. I left space for breakfast and commuting between them, and you're free for lunch. For tonight, Project report and final draft by seven o'clock, ninety minutes to focus on that.",
+      "ms": 36388,
       "brain": "groq"
     }
   ]

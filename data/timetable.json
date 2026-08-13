@@ -1,28 +1,40 @@
 {
-  "_comment": "Weekly class grid. PLACEHOLDER CONTENT, replace with the real timetable. Times are 24h local.",
+  "_comment": "Weekly class grid, JSS Sem 5, batch A1 (other batch's lab rows dropped). Times are 24h local.",
   "owner": "aditya",
   "week": {
     "Monday": [
-      {"start": "09:00", "end": "10:00", "title": "Computer Networks", "location": "LT-3"},
-      {"start": "11:00", "end": "12:00", "title": "DBMS", "location": "LT-1"},
-      {"start": "14:00", "end": "16:00", "title": "DBMS Lab", "location": "Lab-2"}
+      {"start": "08:45", "end": "09:45", "title": "COI", "location": "BNC-501"},
+      {"start": "09:45", "end": "10:45", "title": "WT", "location": "BCS-502"},
+      {"start": "10:45", "end": "11:45", "title": "DAA", "location": "BCS-503"},
+      {"start": "11:45", "end": "12:45", "title": "DBMS", "location": "BCS-501"},
+      {"start": "13:45", "end": "15:45", "title": "Internship Assessment", "location": "BCS-554"}
     ],
     "Tuesday": [
-      {"start": "10:00", "end": "11:00", "title": "Operating Systems", "location": "LT-2"},
-      {"start": "12:00", "end": "13:00", "title": "Software Engineering", "location": "LT-4"}
+      {"start": "08:45", "end": "10:45", "title": "DAA Lab", "location": "Lab-10"},
+      {"start": "10:45", "end": "11:45", "title": "DAA", "location": "BCS-503"},
+      {"start": "11:45", "end": "12:45", "title": "OOSD", "location": "BCS-054"}
     ],
     "Wednesday": [
-      {"start": "09:00", "end": "10:00", "title": "Computer Networks", "location": "LT-3"},
-      {"start": "11:00", "end": "13:00", "title": "Networks Lab", "location": "Lab-1"},
-      {"start": "15:00", "end": "16:00", "title": "Economics", "location": "LT-5"}
+      {"start": "09:45", "end": "10:45", "title": "DAA", "location": "BCS-503"},
+      {"start": "10:45", "end": "11:45", "title": "OOSD", "location": "BCS-054"},
+      {"start": "11:45", "end": "12:45", "title": "DBMS", "location": "BCS-501"},
+      {"start": "13:45", "end": "14:45", "title": "WT", "location": "BCS-502"},
+      {"start": "14:45", "end": "15:45", "title": "ASC", "location": "BCS-056"}
     ],
     "Thursday": [
-      {"start": "10:00", "end": "11:00", "title": "Operating Systems", "location": "LT-2"},
-      {"start": "11:00", "end": "12:00", "title": "DBMS", "location": "LT-1"}
+      {"start": "08:45", "end": "09:45", "title": "WT", "location": "BCS-502"},
+      {"start": "09:45", "end": "10:45", "title": "DBMS", "location": "BCS-501"},
+      {"start": "10:45", "end": "12:45", "title": "WT Lab", "location": "Lab-10"},
+      {"start": "13:45", "end": "14:45", "title": "ASC", "location": "BCS-056"},
+      {"start": "14:45", "end": "15:45", "title": "OOSD", "location": "BCS-054"},
+      {"start": "15:45", "end": "16:45", "title": "COI", "location": "BNC-501"}
     ],
     "Friday": [
-      {"start": "09:00", "end": "11:00", "title": "OS Lab", "location": "Lab-3"},
-      {"start": "12:00", "end": "13:00", "title": "Software Engineering", "location": "LT-4"}
+      {"start": "10:45", "end": "11:45", "title": "ASC", "location": "BCS-056"},
+      {"start": "11:45", "end": "12:45", "title": "WT", "location": "BCS-502"},
+      {"start": "13:45", "end": "14:45", "title": "DAA", "location": "BCS-503"},
+      {"start": "14:45", "end": "15:45", "title": "DBMS", "location": "BCS-501"},
+      {"start": "15:45", "end": "16:45", "title": "DBMS Lab", "location": "Lab-9"}
     ],
     "Saturday": [],
     "Sunday": []

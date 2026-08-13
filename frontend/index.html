@@ -35,7 +35,7 @@ body{
 /* ---------- header ---------- */
 header{display:flex;flex-direction:column;align-items:center;margin-bottom:4px;text-align:center;flex:0 0 auto}
 #headmeta{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
-#clock{font-size:10px;letter-spacing:.14em;font-weight:600;color:var(--tx2);
+#clock,#datechip{font-size:10px;letter-spacing:.14em;font-weight:600;color:var(--tx2);
   border:1px solid var(--edge-soft);background:rgba(255,255,255,.04);
   border-radius:9999px;padding:3px 12px;font-variant-numeric:tabular-nums}
 #nextup{font-size:10px;letter-spacing:.06em;font-weight:600;color:var(--primary);
@@ -197,6 +197,7 @@ li.rec .sc{font-size:9.5px;color:var(--bloom);font-variant-numeric:tabular-nums}
   <div class="sub">Observant &amp; Sentient</div>
   <div id="headmeta">
     <span id="clock">--:--</span>
+    <span id="datechip"></span>
     <span id="nextup"></span>
     <span class="sim">SIMULATED WEARABLE DATA</span>
   </div>
@@ -272,6 +273,7 @@ function tickClock(){
   const h=d.getHours(), m=String(d.getMinutes()).padStart(2,"0");
   const h12=h%12||12, part=h<12?"AM":"PM";
   $("clock").textContent=`${d.toLocaleDateString(undefined,{weekday:"short"})} ${h12}:${m} ${part}`;
+  $("datechip").textContent=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
 }
 setInterval(tickClock,1000); tickClock();
 let audio=null,recog=null,heardText="",lastReply="",speaking=false,busy=false,armed=false,pending;
@@ -372,7 +374,9 @@ async function mem(){
 async function sleepCard(){
   try{
     const d=await(await fetch("/wearable")).json();
-    const days=d.sleep_hours||[];
+    // the fixture carries fourteen days; the card shows only the last seven
+    // so the bars stay readable at 300px
+    const days=(d.sleep_hours||[]).slice(-7);
     const max=Math.max(...days.map(x=>x.hours),8);
     $("bars").innerHTML="";
     days.forEach(x=>{
@@ -394,10 +398,35 @@ function lat(l){ if(!l)return;
   $("brain").textContent=l.brain; $("lLlm").textContent=l.llm_ms+"ms";
   $("lTts").textContent=l.tts_ms+"ms"; $("lTot").textContent=l.total_ms+"ms"; }
 
+/* whole-sentence chunks of ~160 chars for the orb: pack sentences greedily,
+   never splitting one mid-sentence (an overlong sentence stays intact) */
+function chunkReply(text){
+  const sents=text.match(/[^.!?]+[.!?]*/g)||[text];
+  const chunks=[]; let cur="";
+  for(const s of sents){
+    if(cur && (cur+s).length>160){chunks.push(cur.trim()); cur="";}
+    cur+=s;
+  }
+  if(cur.trim())chunks.push(cur.trim());
+  return chunks.length?chunks:[text];
+}
 function play(b64,done){
   if(!b64){done();return}
   audio=new Audio("data:audio/mp3;base64,"+b64);
-  speaking=true; aura("speak","SPEAKING"); $("orbText").textContent=lastReply;
+  speaking=true; aura("speak","SPEAKING");
+  /* paginate the reply in step with playback: advance by audio progress
+     weighted by cumulative character count, so longer chunks hold longer.
+     Barge-in pauses and nulls `audio`, which stops the advance on its own. */
+  const chunks=chunkReply(lastReply);
+  const total=chunks.reduce((a,c)=>a+c.length,0)||1;
+  let acc=0; const cum=chunks.map(c=>(acc+=c.length)/total);
+  let ci=0; $("orbText").textContent=chunks[0];
+  audio.ontimeupdate=()=>{
+    if(!speaking||!audio||!audio.duration)return;
+    const f=audio.currentTime/audio.duration;
+    let ni=ci; while(ni<chunks.length-1 && f>=cum[ni])ni++;
+    if(ni!==ci){ci=ni; $("orbText").textContent=chunks[ci];}
+  };
   $("micHint").textContent="Hold the orb to cut in";
   st("");
   const end=()=>{speaking=false;audio=null;stopViz();aura("idle","");

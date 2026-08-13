@@ -98,6 +98,34 @@ def main() -> None:
     memory.upsert(USER, "preference", "Prefers short, direct answers. Hates being managed.")
     print("seeded 1 preference")
 
+    # --- real additions (owner-provided), layered ON TOP of the synthetic
+    # fixture above. Additive only: never remove or alter the synthetic seed,
+    # and every SIMULATED badge stays exactly as it is. ---
+    real_tasks = [
+        ("Project report — high priority, due this week. Sections: introduction, "
+         "methodology, results and discussion, conclusion and references. "
+         "Postponed twice already.",
+         {"status": "todo", "priority": "high", "postpone_count": 2}),
+        ("DBMS assignment (BCS-501) — pending, due soon.",
+         {"status": "todo", "priority": "normal", "postpone_count": 0}),
+        ("CIA 1 preparation — first week of September. Strategy: PYQ-first using "
+         "past papers and Gateway one-shots, all five subjects: DAA, DBMS, WT, "
+         "OOSD, ASC.",
+         {"status": "todo", "priority": "normal", "postpone_count": 0}),
+    ]
+    for text, extra in real_tasks:
+        memory.upsert(USER, "task", text, extra)
+    print(f"seeded {len(real_tasks)} real tasks")
+
+    real_prefs = [
+        "Prefers studying after 4 PM.",
+        "Commute is about an hour each way to college.",
+        "Exam prep style: PYQ-first — past papers before new material.",
+    ]
+    for p in real_prefs:
+        memory.upsert(USER, "preference", p)
+    print(f"seeded {len(real_prefs)} real preferences")
+
     print("\nseed complete:", len(memory.list_all(USER)), "points for", USER)
 
 
