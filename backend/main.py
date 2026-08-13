@@ -20,6 +20,7 @@ load_dotenv(ROOT / ".env")
 
 import clock
 import emotion
+import gcal
 import latency_log
 import llm_client
 import memory
@@ -76,6 +77,12 @@ def _context_block(user_id: str, transcript: str) -> tuple[str, list[dict]]:
     ][:4]
     open_tasks = tools.unsuppressed_board(user_id)
     lines = [clock.current_moment(), timetable.context_line()]
+
+    # Phase 1: live calendar joins the context when connected; on conflict the
+    # calendar event wins (it is the real world; the timetable is the routine)
+    if gcal.available():
+        lines.append(gcal.context_line())
+        lines.append(gcal.capability_line())
 
     # voice tone from the PREVIOUS turn, if it was confident. Consumed once so a
     # stale read cannot colour later turns. Deliberately phrased as a hint, not
@@ -258,6 +265,13 @@ def state(user_id: str = os.getenv("DEFAULT_USER_ID", "aditya")):
     /session/start is still composing the spoken opener."""
     flag = pattern_engine.session_scan(user_id)
     nxt = timetable.next_class()
+    # Phase 1: the header chip shows whichever comes first, live calendar event
+    # or timetable class; the calendar wins a tie because it is the real world
+    if gcal.available():
+        ev = gcal.next_event()
+        if ev and (not nxt or nxt.get("tomorrow") or ev["start"] <= nxt["start"]):
+            nxt = {"title": ev["title"], "start": ev["start"],
+                   "location": ev.get("location", ""), "tomorrow": False}
     return {
         "board": tools.board(user_id),
         "memories": memory.list_all(user_id),

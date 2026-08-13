@@ -168,6 +168,17 @@ EXECUTORS = {
     "memory_delete": memory_delete,
 }
 
+# Phase 1: calendar executors join the table only while credentials exist on
+# disk; a machine without credentials.json runs the legacy table, unchanged.
+import gcal  # noqa: E402  (import cycle-free: gcal imports only clock)
+
+if gcal.available():
+    EXECUTORS.update({
+        "list_calendar_events": gcal.exec_list,
+        "create_event": gcal.exec_create,
+        "move_event": gcal.exec_move,
+    })
+
 
 def execute(user_id: str, actions: list[dict]) -> list[dict]:
     """Run each action; a failing action never crashes the turn."""
