@@ -13,10 +13,13 @@ import time
 logger = logging.getLogger("eira.llm")
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
-# Measured against gpt-oss-120b on the FINAL persona + few-shot: llama is warmer
-# AND ~4x faster (median 681 ms vs 2965 ms, equal reactive-sound count). The
-# earlier terseness was the prompt, not the model, once the persona named the
-# sounds and forbade bare acknowledgements, llama carried the register fine.
+# HEDGE CHAIN (measured 2026-08-13): llama-3.3 is deprecated by Groq but
+# demonstrably still serving, and the persona was calibrated on it — it stays
+# primary until decommission actually lands. The gpt-oss models are the tested
+# insurance layer for that day: harness-verified at reasoning_effort=medium +
+# temp 0.6 (their best config; gpt-oss at low collapses into telegraphic
+# list-speak and drops persona invariants). Gemini remains the brain-level
+# fallback behind the whole chain.
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
@@ -90,11 +93,11 @@ def _gemini_call(genai, types, api_key: str, system: str, messages: list[dict]) 
     return resp.text
 
 
-# Groq's free tier caps tokens PER MODEL per day (100k TPD each). Heavy testing
-# exhausted llama's budget mid-build, so the chain walks sibling models, each
-# with its own budget, before giving up and letting Gemini catch it.
-# gpt-oss-120b was the measured warmth runner-up; 8b-instant is the last resort.
-GROQ_CHAIN = list(dict.fromkeys([GROQ_MODEL, "openai/gpt-oss-120b", "llama-3.1-8b-instant"]))
+# Groq's free tier caps tokens PER MODEL per day (100k TPD each). The chain
+# walks sibling models, each with its own budget, before giving up and letting
+# Gemini catch it. Order: deprecated-but-serving llama primary, then the
+# gpt-oss insurance pair (120b, then 20b as last resort).
+GROQ_CHAIN = list(dict.fromkeys([GROQ_MODEL, "openai/gpt-oss-120b", "openai/gpt-oss-20b"]))
 _groq_idx = 0  # sticky: remember which model is currently accepting
 
 
@@ -107,10 +110,19 @@ def _groq(system: str, messages: list[dict]) -> str:
     for offset in range(len(GROQ_CHAIN)):
         idx = (_groq_idx + offset) % len(GROQ_CHAIN)
         try:
+            model = GROQ_CHAIN[idx]
+            # per-model params: llama rejects reasoning_effort outright and the
+            # persona is calibrated on its default sampling — send it a legacy
+            # call. gpt-oss gets its harness-verified best config.
+            extra = (
+                {"reasoning_effort": "medium", "temperature": 0.6}
+                if model.startswith("openai/gpt-oss") else {}
+            )
             resp = client.chat.completions.create(
-                model=GROQ_CHAIN[idx],
+                model=model,
                 messages=[{"role": "system", "content": system}, *messages],
                 response_format={"type": "json_object"},
+                **extra,
             )
             _groq_idx = idx
             return resp.choices[0].message.content
