@@ -20,3 +20,7 @@ qdrant-docs.md
 finale_master_brief.md
 NIGHT_REPORT.md
 docs/DEFENSE.md
+
+# Google OAuth (Phase 1+): local secrets, never committed
+credentials.json
+token.json
