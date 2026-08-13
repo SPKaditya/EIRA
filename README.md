@@ -7,7 +7,10 @@ renegotiates your day out loud. Ask her to drop a subject and she drops it for g
 Built for **StarForge 2026 · VoxForge track**.
 Voice by **Rime Coda** · memory by **Qdrant** · reasoning by **Groq + Gemini**.
 
-![EIRA opens the session on her own, citing the sleep pattern she found](docs/01-proactive-open.png)
+![The live console: R4 raises recovery with receipts, unprompted — real timetable, live clock, brain and latency on record](docs/04-live-console.png)
+
+One real conversation, recorded with per-turn brains and latencies:
+[docs/showcase-transcript.md](docs/showcase-transcript.md)
 
 ---
 
