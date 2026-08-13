@@ -24,6 +24,19 @@ def main() -> None:
     memory.wipe_user(USER)
     print(f"wiped user '{USER}'")
 
+    # also wipe the eval harness's second tenant: E11's chat turn can write
+    # rows for that user, and fixture rows must not accumulate across runs.
+    # Only these two known ids ever get wiped, nothing global.
+    try:
+        other = json.loads(
+            (ROOT / "data" / "eval_set.json").read_text(encoding="utf-8")
+        ).get("other_user_id")
+    except (OSError, ValueError):
+        other = None
+    if other and other != USER:
+        memory.wipe_user(other)
+        print(f"wiped eval test user '{other}'")
+
     wpath = ROOT / "data" / "wearable_sim.json"
     if not wpath.exists():
         sys.exit("data/wearable_sim.json missing, run scripts/gen_wearables.py first")
@@ -106,11 +119,11 @@ def main() -> None:
          "methodology, results and discussion, conclusion and references. "
          "Postponed twice already.",
          {"status": "todo", "priority": "high", "postpone_count": 2}),
-        ("DBMS assignment (BCS-501) — pending, due soon.",
+        ("DBMS assignment — pending, due soon.",
          {"status": "todo", "priority": "normal", "postpone_count": 0}),
-        ("CIA 1 preparation — first week of September. Strategy: PYQ-first using "
-         "past papers and Gateway one-shots, all five subjects: DAA, DBMS, WT, "
-         "OOSD, ASC.",
+        ("CIA One preparation — first week of September, PYQ-first via past "
+         "papers and Gateway one-shots across all five subjects: DAA, DBMS, "
+         "WT, OOSD, ASC.",
          {"status": "todo", "priority": "normal", "postpone_count": 0}),
     ]
     for text, extra in real_tasks:
