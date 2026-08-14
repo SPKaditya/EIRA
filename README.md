@@ -85,6 +85,14 @@ And [a full six-beat conversation, recorded from the live system, provider
 hiccups left in on purpose](docs/showcase-transcript.md) — every reply timed,
 every brain named.
 
+Frames from the recorded demo run, unstaged:
+
+![Live grounding: real weather by tool call — "Thirty-one degrees and a thunderstorm in Delhi" — with the instant time answer from the turn before still on screen](docs/05-live-grounding.png)
+
+![The receipt-catch: "Mmhm. That's the fourth time this week you've said you'll handle it" — and the panel shows the exact stored rows the claim rests on](docs/06-receipt-catch.png)
+
+![Renegotiating the plan by voice: classes run till five, so the report moves to the evening and the plan is trimmed because sleep ran short](docs/07-plan-negotiation.png)
+
 ## Architecture
 
 ```
