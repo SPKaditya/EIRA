@@ -240,8 +240,8 @@ and tail latencies there stretch well past what a live conversation sees.
 
 ## Limitations, stated plainly
 
-- **Wearable data is simulated** (`data/wearable_sim.json`), badged as such in the
-  interface. HealthKit / Google Fit integration is roadmap, not built.
+- **Wearable data is simulated** (`data/wearable_sim.json`), badged as such in
+  the interface; real integrations are in the roadmap below.
 - **A speech-emotion classifier (wav2vec2, confidence-gated) is built and exposed
   at `/emotion`, but deliberately not fused into replies yet** — at ~62% benchmark
   accuracy, a confidently wrong tone read is worse than none. Fusion ships behind
@@ -259,6 +259,17 @@ API keys are server-side only and never reach the browser. The frontend talks
 only to this backend. `.env` is gitignored and `.env.example` ships with empty
 placeholders. All demo content is synthetic: no real personal data appears in
 prompts, logs, screenshots, or this repository.
+
+## Roadmap
+
+Next: **EIRA in the browser.** The frontend is already a single static page and
+the STT is already Chrome's — so EIRA's natural next body is a Chrome
+extension: a side panel summoned by a shortcut on any tab, with the active page
+as context ("summarize this," "add this deadline to my board") flowing through
+the same bounded tool loop. The backend doesn't change; the tool layer was
+built transport-agnostic for exactly this. Alongside: emotion fusion behind its
+ear-tested checkpoint, Gmail/Calendar consent onboarding polish, MCP migration
+of the tool layer, and HealthKit/Google Fit replacing the simulated wearables.
 
 ## Built with
 
