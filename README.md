@@ -13,8 +13,6 @@ Voice by **Rime Coda** · memory by **Qdrant** · reasoning by **Groq + Gemini**
 
 [![EIRA demo — live session: proactive HRV opener, instant time and weather, receipt-catch, plan renegotiation, suppression](https://img.youtube.com/vi/KCWBykuqW8o/maxresdefault.jpg)](https://youtu.be/KCWBykuqW8o)
 
-*Click to watch — the six-beat script it follows is in [SUBMISSION.md](SUBMISSION.md).*
-
 ---
 
 ## The idea
