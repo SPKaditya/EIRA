@@ -24,3 +24,6 @@ docs/DEFENSE.md
 # Google OAuth (Phase 1+): local secrets, never committed
 credentials.json
 token.json
+
+# local tooling config, never in the repo
+CLAUDE.md
