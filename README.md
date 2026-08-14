@@ -9,6 +9,13 @@ Voice by **Rime Coda** · memory by **Qdrant** · reasoning by **Groq + Gemini**
 
 ![EIRA opens the session on her own, citing the sleep pattern she found](docs/01-proactive-open.png)
 
+## Demo
+
+<!-- VIDEO: paste the YouTube link and this becomes a linked thumbnail:
+[![EIRA demo](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://youtu.be/VIDEO_ID)
+-->
+*Demo video lands here — the six-beat script it follows is in [SUBMISSION.md](SUBMISSION.md).*
+
 ---
 
 ## The idea
@@ -26,6 +33,14 @@ evidence to raise gently, once.
 Every claim she makes is backed by a **receipt** shown in the interface. She never
 says "you seem tired"; she says "three nights under six hours" and shows you the
 row it came from.
+
+This matters because assistants that only react miss the person: burnout
+signals live in patterns *across days* — short sleep compounding, the same task
+postponed twice, HRV sliding under its own baseline — and no single
+conversation surfaces them. The contribution here is surfacing those patterns
+with evidence and consent: a receipts-first interface, a consent ladder she
+actually obeys, a persona engineered and regression-tested like code, and a
+bounded tool loop that stays reliable on free-tier models.
 
 ## Three things worth looking at
 
@@ -116,6 +131,15 @@ Keys needed: [Rime](https://app.rime.ai/tokens) ·
 [Groq](https://console.groq.com/keys) ·
 [Gemini](https://aistudio.google.com/apikey).
 
+### Reproduce our results
+
+```bash
+python scripts/seed_data.py     # fresh fixture, dates rolled to today
+python scripts/eval_harness.py  # expect 12/12 — every behavioral invariant held; writes data/eval_report.json
+python scripts/agent_smoke.py   # expect 6/6 — tool loop, preemption, live weather, iteration cap, graceful-unconnected
+python scripts/e2e_test.py      # scripted conversation at human pace — green means no silent turns, no digit leaks
+```
+
 ## What she can do (agentic layer)
 
 - **Bounded native tool loop** — OpenAI-style function calling, hard-capped at
@@ -193,6 +217,27 @@ the fix lands in the prompt rather than in a regex patch.
 executor table; anything outside it is refused and logged, so a hallucinated tool
 call degrades to a normal turn instead of an error.
 
+## Measured performance
+
+A voice companion is judged on perceived turn latency and behavioral
+correctness — does she answer fast, and does she *stay* correct: suppression
+permanent, zero digits to the voice, tenants isolated. So the persona is
+regression-tested like code, and every number below comes from a shipped
+report, not an estimate.
+
+| metric | measured |
+|---|---|
+| Spoken turn, end-to-end at human pace | p50 ≈ 5.5 s (`data/e2e_report.json` — zero silent turns, zero digit leaks) |
+| LLM leg, single turn on the current chain | ~0.9–1.5 s typical |
+| Session flag: pattern scan → receipts in UI | under one second — no LLM in that path |
+| Speech-emotion inference (`/emotion`) | ~165 ms warm; gated at 1.5 s / 0.55 confidence |
+| Eval harness — 12 behavioral cases | **12/12** (`data/eval_report.json`): two-beat deflection, suppression holds across three turns, forget actually deletes, tenant isolation, no digits ever spoken |
+| Agent smoke — tool loop | **6/6** at commit; a freeze-hour re-run scored 4/6 purely on exhausted free-tier daily budgets, identical code |
+| Codebase | ~2,800 lines, no agent framework |
+
+One honest caveat: free-tier providers vary — batch test runs self-throttle,
+and tail latencies there stretch well past what a live conversation sees.
+
 ## Limitations, stated plainly
 
 - **Wearable data is simulated** (`data/wearable_sim.json`), badged as such in the
@@ -214,6 +259,14 @@ API keys are server-side only and never reach the browser. The frontend talks
 only to this backend. `.env` is gitignored and `.env.example` ships with empty
 placeholders. All demo content is synthetic: no real personal data appears in
 prompts, logs, screenshots, or this repository.
+
+## Built with
+
+- **[Rime](https://rime.ai)** — Coda TTS, voice "nadi": every word EIRA speaks.
+- **[Qdrant](https://qdrant.tech)** — Qdrant Cloud vector memory: the receipts
+  behind every claim she makes, and the multitenancy pattern we build on.
+- **Pathway** and **Weya** — partners of StarForge 2026, the event this was
+  built for.
 
 ## About
 
