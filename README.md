@@ -11,10 +11,9 @@ Voice by **Rime Coda** · memory by **Qdrant** · reasoning by **Groq + Gemini**
 
 ## Demo
 
-<!-- VIDEO: paste the YouTube link and this becomes a linked thumbnail:
-[![EIRA demo](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://youtu.be/VIDEO_ID)
--->
-*Demo video lands here — the six-beat script it follows is in [SUBMISSION.md](SUBMISSION.md).*
+[![EIRA demo — live session: proactive HRV opener, instant time and weather, receipt-catch, plan renegotiation, suppression](https://img.youtube.com/vi/KCWBykuqW8o/maxresdefault.jpg)](https://youtu.be/KCWBykuqW8o)
+
+*Click to watch — the six-beat script it follows is in [SUBMISSION.md](SUBMISSION.md).*
 
 ---
 
